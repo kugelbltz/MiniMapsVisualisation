@@ -1,11 +1,18 @@
-QT += widgets
+QT += widgets \
+    uitools
 
 FORMS += \
-    interface.ui
+    interface.ui \
+    itineraire.ui \
+    carte.ui
 
 HEADERS += \
-    interface.h
+    interface.h \
+    itineraire.h \
+    carte.h
 
 SOURCES += \
     interface.cpp \
-    main.cpp
+    main.cpp \
+    itineraire.cpp \
+    carte.cpp

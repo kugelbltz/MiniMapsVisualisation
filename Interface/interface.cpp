@@ -2,6 +2,9 @@
 #include "ui_interface.h"
 #include <QGraphicsPixmapItem>
 #include <iostream>
+#include "itineraire.h"
+#include <QDir>
+#include "carte.h"
 
 using namespace std;
 
@@ -11,20 +14,10 @@ Interface::Interface(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QImage image("C:/Users/User/OneDrive/Documents/Enseirb/S8/ProjetAvance/Interface/Assets/bg.jpg");
-    m_carte = new QGraphicsPixmapItem(QPixmap::fromImage(image));
-    m_scene = new QGraphicsScene;
-    ui->carte->setScene(m_scene);
-    m_scene->addItem(m_carte);
-    m_scale = qreal(ui->zoom->value()/100.0);
-    m_carte->setScale(m_scale);
+    /* CARTE : NAVIGATION ET MISE EN PLACE */
 
-    m_scene->setSceneRect(0,0, m_carte->pixmap().width()*m_scale,m_carte->pixmap().height()*m_scale);
-
-    ui->carte->show();
-    ui->description->hide();
-    ui->fullDescription->hide();
-
+    m_carte = new Carte(this);
+    ui->horizontalLayout->addWidget(m_carte);
 }
 
 Interface::~Interface()
@@ -32,27 +25,33 @@ Interface::~Interface()
     delete ui;
 }
 
-void Interface::on_zoom_valueChanged(int value) {
-    m_scale = value/100.0;
-    m_scene->setSceneRect(0,0, m_carte->pixmap().width()*m_scale,m_carte->pixmap().height()*m_scale);
-    m_carte->setScale(m_scale);
+void Interface::addItineraries() {
+    for (int i(0); i < m_itineraires.length(); i++) {
+        ui->itineraryLayout->removeWidget(m_itineraires.at(i));
+        delete m_itineraires.at(i);
+    }
+    m_itineraires.clear();
+    // Ca marche pas tres bien il faut enlever les itineraires précédents
+    getItineraires(0,0,0,0);
+
+    // C'est là qu'on fait appelle a la partie algo.
+
+    for (int i(0); i < m_itineraires.length(); i++) {
+        ui->itineraryLayout->insertWidget(i+1, m_itineraires.at(i));
+    }
 }
 
-void Interface::on_up_pressed() {
-    ui->carte->viewport()->scroll(0,1);
+void Interface::on_swap_clicked() {
+    QString temp = ui->startEdit->text();
+    ui->startEdit->setText(ui->endEdit->text());
+    ui->endEdit->setText(temp);
 }
 
-void Interface::on_down_pressed() {
-    QPointF test = ui->carte->mapToScene(ui->carte->rect().center());
-    ui->carte->centerOn(test.x(),test.y());
+void Interface::on_search_clicked() {
+    addItineraries();
 }
 
-void Interface::on_left_pressed() {
-    QPointF test = ui->carte->mapToScene(ui->carte->rect()).boundingRect().center();
-    ui->carte->centerOn(test.x(),test.y());
-}
-
-void Interface::on_right_pressed() {
-    QPointF test = ui->carte->mapToScene(ui->carte->rect()).boundingRect().center();
-    ui->carte->centerOn(test.x(),test.y());
+void Interface::getItineraires(qreal startLat, qreal startLon, qreal endLat, qreal endLon) {
+    m_itineraires.push_back(new Itineraire("15h30 : Chatelet\nM >> Ligne 1 direction Reims\n16h : Marne la Vallée\n:) >> Marcher 30 min\n16h30 : DisneyLand Paris\nB >> Bus 45 direction Magny-le-Hongre Ciale\n...", this));
+    m_itineraires.push_back(new Itineraire("15h30 : Chatelet\nM >> Ligne 1 direction Reims\n16h : Marne la Vallée\n:) >> Marcher 30 min\n16h30 : DisneyLand Paris\nB >> Bus 45 direction Magny-le-Hongre Ciale\n...", this));
 }

@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QGraphicsPixmapItem>
+#include "carte.h"
+#include "itineraire.h"
+#include <QVector>
 
 namespace Ui {
 class Interface;
@@ -15,17 +18,19 @@ class Interface : public QMainWindow
 public:
     explicit Interface(QWidget *parent = nullptr);
     ~Interface();
+    void addItineraries();
+    void getItineraires(qreal startLat, qreal startLon, qreal endLat, qreal endLon);
+
 private slots:
-    void on_zoom_valueChanged(int value);
-    void on_up_pressed();
-    void on_down_pressed();
-    void on_left_pressed();
-    void on_right_pressed();
+    void on_swap_clicked();
+    void on_search_clicked();
+
 private:
     Ui::Interface *ui;
-    QGraphicsPixmapItem * m_carte;
-    QGraphicsScene * m_scene;
-    qreal m_scale;
+
+    Carte * m_carte;
+
+    QVector<Itineraire*> m_itineraires;
 };
 
 #endif // INTERFACE_H
