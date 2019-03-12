@@ -1,5 +1,6 @@
 QT += widgets \
-    uitools
+    location \
+    quickwidgets
 
 FORMS += \
     interface.ui \
@@ -16,3 +17,6 @@ SOURCES += \
     main.cpp \
     itineraire.cpp \
     carte.cpp
+
+DISTFILES += \
+    map.qml

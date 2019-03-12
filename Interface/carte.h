@@ -16,6 +16,7 @@ class Carte : public QWidget
 public:
     explicit Carte(QWidget *parent = nullptr);
     ~Carte();
+    QPoint toXY(qreal lat, qreal lon);
 
 private:
     Ui::Carte *ui;

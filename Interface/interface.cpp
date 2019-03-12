@@ -5,6 +5,7 @@
 #include "itineraire.h"
 #include <QDir>
 #include "carte.h"
+#include <QQuickView>
 
 using namespace std;
 
@@ -16,8 +17,11 @@ Interface::Interface(QWidget *parent) :
 
     /* CARTE : NAVIGATION ET MISE EN PLACE */
 
-    m_carte = new Carte(this);
-    ui->horizontalLayout->addWidget(m_carte);
+    //m_carte = new Carte(this);
+    //ui->horizontalLayout->addWidget(m_carte);
+
+    //QQuickWidget * view = new QQuickWidget;
+    ui->testMap->setSource(QUrl::fromLocalFile("../Interface/map.qml"));
 }
 
 Interface::~Interface()
