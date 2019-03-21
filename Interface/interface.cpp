@@ -6,6 +6,15 @@
 #include <QDir>
 #include "carte.h"
 #include <QQuickView>
+#include <QMetaObject>
+#include <QVariant>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QQmlEngine>
+#include <QQmlContext>
+#include <QQuickItem>
+#include <QHash>
 
 using namespace std;
 
@@ -15,13 +24,11 @@ Interface::Interface(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    /* CARTE : NAVIGATION ET MISE EN PLACE */
-
-    //m_carte = new Carte(this);
-    //ui->horizontalLayout->addWidget(m_carte);
-
-    //QQuickWidget * view = new QQuickWidget;
     ui->testMap->setSource(QUrl::fromLocalFile("../Interface/map.qml"));
+
+
+    //TEST
+
 }
 
 Interface::~Interface()
@@ -29,18 +36,39 @@ Interface::~Interface()
     delete ui;
 }
 
+
 void Interface::addItineraries() {
+    // Enlever les itineraires
+    // il faut enlever les fichiers itineraires aussi !!!
+    //deconnexion du signal aussi !
     for (int i(0); i < m_itineraires.length(); i++) {
         ui->itineraryLayout->removeWidget(m_itineraires.at(i));
         delete m_itineraires.at(i);
     }
     m_itineraires.clear();
-    // Ca marche pas tres bien il faut enlever les itineraires précédents
-    getItineraires(0,0,0,0);
+
+    // Recuperer les entrées et sorties
+    QString start = ui->startEdit->text();
+    QString end = ui->endEdit->text();
+
+    // Les envoyer au calculateur d'itinéraire et récuperer le nombre d'itinéraires
+    // generayion des fichiers itineraires
+    int n(1);
+    // int n = algo(end, start)
+
+
+    for (int i(1); i <= n; i++) {
+        QString filename = QDir::currentPath() + "/../TextFiles/path_" + QString::number(i) + ".txt";
+        m_itineraires.push_back(new Itineraire(filename));
+    }
+
+    for (int i(0); i < n; i++) {
+        connect(m_itineraires.at(i), SIGNAL(moreInfoClicked(QJsonArray, QStringList)), this, SLOT(displayItinerary(QJsonArray, QStringList)));
+    }
 
     // C'est là qu'on fait appelle a la partie algo.
 
-    for (int i(0); i < m_itineraires.length(); i++) {
+    for (int i(0); i < n ; i++) {
         ui->itineraryLayout->insertWidget(i+1, m_itineraires.at(i));
     }
 }
@@ -55,7 +83,19 @@ void Interface::on_search_clicked() {
     addItineraries();
 }
 
-void Interface::getItineraires(qreal startLat, qreal startLon, qreal endLat, qreal endLon) {
-    m_itineraires.push_back(new Itineraire("15h30 : Chatelet\nM >> Ligne 1 direction Reims\n16h : Marne la Vallée\n:) >> Marcher 30 min\n16h30 : DisneyLand Paris\nB >> Bus 45 direction Magny-le-Hongre Ciale\n...", this));
-    m_itineraires.push_back(new Itineraire("15h30 : Chatelet\nM >> Ligne 1 direction Reims\n16h : Marne la Vallée\n:) >> Marcher 30 min\n16h30 : DisneyLand Paris\nB >> Bus 45 direction Magny-le-Hongre Ciale\n...", this));
+void Interface::displayItinerary(QJsonArray paths, QStringList colors) {
+    QVariant returnedValue;
+    QObject * object = ui->testMap->rootObject()->findChild<QObject*>("mapObject");
+
+    for (int i(0); i < paths.size(); i++) {
+        QVariant path = paths.at(i);
+        QVariant color = colors.at(i);
+        //QVariant color = m_transportColor[(i%2 == 0) ? "tram" : "walking"]; // c'est juste pour tester
+        // il faudra un atre tableau ou il y aura la couleur ou le type de transport
+        QMetaObject::invokeMethod(object, "loadSection",
+                                  Q_RETURN_ARG(QVariant, returnedValue),
+                                  Q_ARG(QVariant, color),
+                                  Q_ARG(QVariant, path));
+
+    }
 }

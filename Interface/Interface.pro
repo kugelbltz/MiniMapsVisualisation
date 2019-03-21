@@ -19,4 +19,7 @@ SOURCES += \
     carte.cpp
 
 DISTFILES += \
-    map.qml
+    map.qml \
+    section.qml \
+    nodes.txt \
+    path_1.txt

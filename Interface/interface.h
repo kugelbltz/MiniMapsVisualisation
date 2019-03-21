@@ -6,6 +6,9 @@
 #include "carte.h"
 #include "itineraire.h"
 #include <QVector>
+#include <QHash>
+#include <QJsonArray>
+#include <QStringList>
 
 namespace Ui {
 class Interface;
@@ -19,17 +22,15 @@ public:
     explicit Interface(QWidget *parent = nullptr);
     ~Interface();
     void addItineraries();
-    void getItineraires(qreal startLat, qreal startLon, qreal endLat, qreal endLon);
 
 private slots:
     void on_swap_clicked();
     void on_search_clicked();
+    void displayItinerary(QJsonArray, QStringList);
 
 private:
     Ui::Interface *ui;
-
     Carte * m_carte;
-
     QVector<Itineraire*> m_itineraires;
 };
 
