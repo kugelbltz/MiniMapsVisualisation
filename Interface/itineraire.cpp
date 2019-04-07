@@ -15,6 +15,8 @@ Itineraire::Itineraire(QString filename, QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setMouseTracking(true);
+
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
@@ -23,6 +25,9 @@ Itineraire::Itineraire(QString filename, QWidget *parent) :
     QString steps;
     QString startTime;
     QString endTime;
+
+    ui->fullDescription->setAcceptRichText(true);
+    //ui->fullDescription->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Minimum);
 
     while (!in.atEnd()) {
         QString info = in.readLine();
@@ -41,8 +46,12 @@ Itineraire::Itineraire(QString filename, QWidget *parent) :
         steps += type;
         steps += " - ";
 
-        m_colors.push_back(m_transportColor[type]);
+        ui->fullDescription->setCurrentFont(QFont("Raleway", 13, 63));
+        ui->fullDescription->append(startTime + " : name");
+        ui->fullDescription->setCurrentFont(QFont("Raleway", 11));
+        ui->fullDescription->append("\t Faire ça pendant X minutes");
 
+        m_colors.push_back(m_transportColor[type]);
     }
 
     file.close();
@@ -57,11 +66,21 @@ Itineraire::Itineraire(QString filename, QWidget *parent) :
     ui->duration->setText(QString::number(duration.minute()) + " min");
     ui->timeSlot->setText(startTime + " - " + endTime);
     ui->steps->setText(steps);
-    ui->fullDescription->setText(filename);
+    ui->fullDescription->setCurrentFont(QFont("Raleway", 13, 63));
+    ui->fullDescription->append(endTime + " : name");
     ui->fullDescription->setReadOnly(true);
     ui->fullDescription->hide();
+    ui->line->hide();
 
-    connect(ui->moreInfo, SIGNAL(clicked()), this, SLOT(toggleFullDescription()));
+
+    ui->frame->setStyleSheet("QWidget {background-color:lightgray}"
+
+                             "QFrame#frame {border: 0px;"
+                             "border-radius:10px}"
+
+                             "QLabel#duration, QLabel#timeSlot {font: 13pt Abel}"
+
+                             "QLabel#steps {font: 17pt Abel}");
 }
 
 // SET TRANSPORT COLOR CODE
@@ -79,15 +98,6 @@ Itineraire::~Itineraire()
 {
     delete ui;
 }
-
-void Itineraire::toggleFullDescription() {
-    emit moreInfoClicked(m_paths, m_colors);
-
-    bool state = ui->fullDescription->isHidden();
-    (state) ? ui->fullDescription->show() : ui->fullDescription->hide();
-}
-
-
 
 
 void Itineraire::getPath(QStringList nodes) {
@@ -124,4 +134,21 @@ QStringList Itineraire::getNodeCoordinate(int nodeId) {
 
     file.close();
     return QStringList({"0","0"});
+}
+
+void Itineraire::mousePressEvent(QMouseEvent* e) {
+    if(e->button() == Qt::LeftButton) {
+        bool state = ui->fullDescription->isHidden();
+        (state) ? ui->fullDescription->show() : ui->fullDescription->hide();
+        (state) ? ui->line->show() : ui->line->hide();
+        (state) ? ui->line2->show() : ui->line2->hide();
+
+        (state) ? emit showMoreInfo(m_paths, m_colors, this) : hideMoreInfo();
+    }
+}
+
+void Itineraire::hideMoreInfo() {
+    ui->fullDescription->hide();
+    ui->line->hide();
+    ui->line2->hide();
 }

@@ -26,7 +26,8 @@ public:
 private slots:
     void on_swap_clicked();
     void on_search_clicked();
-    void displayItinerary(QJsonArray, QStringList);
+    void displayItinerary(QJsonArray, QStringList, Itineraire *);
+    void mouseCoordinates(QVariant, QVariant);
 
 private:
     Ui::Interface *ui;

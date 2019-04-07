@@ -4,22 +4,22 @@ QT += widgets \
 
 FORMS += \
     interface.ui \
-    itineraire.ui \
-    carte.ui
+    itineraire.ui
 
 HEADERS += \
     interface.h \
-    itineraire.h \
-    carte.h
+    itineraire.h
 
 SOURCES += \
     interface.cpp \
     main.cpp \
-    itineraire.cpp \
-    carte.cpp
+    itineraire.cpp
 
 DISTFILES += \
     map.qml \
     section.qml \
     nodes.txt \
     path_1.txt
+
+RESOURCES += \
+    ressources.qrc

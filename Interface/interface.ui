@@ -13,15 +13,21 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">font: 8pt &quot;Raleway&quot;;</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QWidget" name="widget" native="true">
       <property name="maximumSize">
        <size>
-        <width>300</width>
+        <width>400</width>
         <height>16777215</height>
        </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
@@ -39,27 +45,31 @@
              <item row="0" column="0">
               <widget class="QLabel" name="start">
                <property name="text">
-                <string>Départ</string>
+                <string>Start :</string>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QLineEdit" name="startEdit"/>
+              <widget class="QLineEdit" name="startEdit">
+               <property name="placeholderText">
+                <string>Click on the map or type coordinates</string>
+               </property>
+              </widget>
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="end">
                <property name="text">
-                <string>Arrivée</string>
+                <string>Destination :</string>
                </property>
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QLineEdit" name="endEdit"/>
-             </item>
-             <item row="2" column="1">
-              <widget class="QPushButton" name="search">
-               <property name="text">
-                <string>Rechercher</string>
+              <widget class="QLineEdit" name="endEdit">
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="placeholderText">
+                <string>Click on the map or type coordinates</string>
                </property>
               </widget>
              </item>
@@ -68,24 +78,178 @@
            <item>
             <widget class="QPushButton" name="swap">
              <property name="text">
-              <string>~</string>
+              <string>SWAP</string>
              </property>
             </widget>
            </item>
           </layout>
          </item>
          <item>
-          <spacer name="verticalSpacer">
+          <widget class="Line" name="line">
            <property name="orientation">
-            <enum>Qt::Vertical</enum>
+            <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
+          </widget>
+         </item>
+         <item>
+          <layout class="QGridLayout" name="gridLayout">
+           <property name="topMargin">
+            <number>0</number>
            </property>
-          </spacer>
+           <item row="2" column="0">
+            <widget class="QGroupBox" name="privTrans">
+             <property name="title">
+              <string>Private transportation</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <widget class="QRadioButton" name="walking">
+                <property name="text">
+                 <string>walking</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="bike">
+                <property name="text">
+                 <string>bike</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="car">
+                <property name="text">
+                 <string>car (not available yet)</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <layout class="QFormLayout" name="formLayout_2">
+             <item row="0" column="0">
+              <widget class="QLabel" name="depTime">
+               <property name="text">
+                <string>Leave at :</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QTimeEdit" name="depTimeEdit"/>
+             </item>
+            </layout>
+           </item>
+           <item row="3" column="0" colspan="2">
+            <widget class="QPushButton" name="search">
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="text">
+              <string>Search</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" rowspan="2">
+            <widget class="QGroupBox" name="options">
+             <property name="title">
+              <string>Search for best itineraries given :</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QCheckBox" name="co2">
+                <property name="text">
+                 <string>CO2 emissions</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="effort">
+                <property name="text">
+                 <string>effort</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="connections">
+                <property name="text">
+                 <string>connections</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="price">
+                <property name="text">
+                 <string>price</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="2">
+            <widget class="QLabel" name="criterias">
+             <property name="text">
+              <string>Criterias</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="Line" name="line_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QScrollArea" name="scrollArea">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="scrollAreaWidgetContents_2">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>380</width>
+              <height>205</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <item>
+              <widget class="QWidget" name="techArea" native="true">
+               <layout class="QVBoxLayout" name="verticalLayout_5">
+                <item>
+                 <layout class="QVBoxLayout" name="techLayout">
+                  <item>
+                   <spacer name="verticalSpacer">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>40</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
          </item>
         </layout>
        </item>
@@ -102,14 +266,44 @@
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>874</width>
-     <height>20</height>
+     <height>26</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 165, 67);
+color: rgb(255, 255, 255);
+font: 12pt &quot;Abel&quot;;</string>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>false</bool>
+   </property>
+   <widget class="QMenu" name="menuQuit">
+    <property name="title">
+     <string>Quit</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuIcon">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>Icon</string>
+    </property>
+    <property name="icon">
+     <iconset resource="ressources.qrc">
+      <normaloff>:/icons/Assets/icon.png</normaloff>:/icons/Assets/icon.png</iconset>
+    </property>
+   </widget>
+   <addaction name="menuIcon"/>
+   <addaction name="menuQuit"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
@@ -120,6 +314,8 @@
    <header>QtQuickWidgets/QQuickWidget</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="ressources.qrc"/>
+ </resources>
  <connections/>
 </ui>

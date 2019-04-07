@@ -5,6 +5,8 @@
 #include <QVariant>
 #include <QStringList>
 #include <QJsonArray>
+#include <QMouseEvent>
+#include <QEvent>
 
 namespace Ui {
 class Itineraire;
@@ -20,6 +22,8 @@ public:
     void getPath(QStringList nodes);
     QStringList getNodeCoordinate(int nodeId);
     static QHash<QString, QString> initTransportColor();
+    void mousePressEvent(QMouseEvent*);
+    void hideMoreInfo();
 
 private:
     Ui::Itineraire *ui;
@@ -28,10 +32,7 @@ private:
     static QHash<QString, QString> m_transportColor;
 
 signals:
-    void moreInfoClicked(QJsonArray, QStringList);
-
-private slots:
-    void toggleFullDescription();
+    void showMoreInfo(QJsonArray, QStringList, Itineraire *);
 };
 
 #endif // ITINERAIRE_H

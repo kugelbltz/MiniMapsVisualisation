@@ -7,7 +7,7 @@ int main(int argc, char * argv[]) {
     QApplication app(argc,argv);
 
     Interface fenetre;
-    fenetre.show();
+    fenetre.showMaximized();
 
     return app.exec();
 }
