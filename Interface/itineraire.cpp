@@ -8,8 +8,11 @@
 #include <QTime>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QFile>
+#include <QtMath>
 
-Itineraire::Itineraire(QString filename, QWidget *parent) :
+
+Itineraire::Itineraire(QJsonObject description, QWidget *parent)  :
     QWidget(parent),
     ui(new Ui::Itineraire)
 {
@@ -17,61 +20,57 @@ Itineraire::Itineraire(QString filename, QWidget *parent) :
 
     setMouseTracking(true);
 
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-
-    QTextStream in(&file);
-    QString steps;
-    QString startTime;
-    QString endTime;
-
     ui->fullDescription->setAcceptRichText(true);
-    //ui->fullDescription->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Minimum);
 
-    while (!in.atEnd()) {
-        QString info = in.readLine();
-        QString nodes = in.readLine();
+    QJsonObject criterias = description["criteria"].toObject();
+    QJsonArray sections = description["sections"].toArray();
 
-        QStringList infoList = info.split(" ");
-        QStringList nodesList = nodes.split(" ");
+    QString steps;
 
-        getPath(nodesList);
+    QString startTime = sections[0].toObject()["start"].toString();
+    QString endTime = sections[sections.size()-1].toObject()["end"].toString();
+    QString duration = QString::number(criterias["time"].toInt());
+    QString endName = nodeAPI.getNodeName(sections[sections.size()-1].toObject()["nodes"].toArray()[0].toInt());
 
-        if (startTime.isEmpty())
-            startTime = infoList.at(2);
-        endTime = infoList.at(3);
+    for (int i(0); i < sections.size();i++) {
+        QJsonObject section = sections[i].toObject();
+        QString name = nodeAPI.getNodeName(qint64(section["nodes"].toArray()[0].toInt()));
 
-        QString type = (infoList.at(0) == "walking") ? "walking" : infoList.at(1);
+        getPath(section["nodes"].toArray());
+
+        QString sectionDescription;
+        if (section["public"].toBool()) {
+            sectionDescription = getSectionDescription(section["start"].toString(), section["end"].toString());
+        } else {
+            int nbStops = section["nodes"].toArray().size();
+            sectionDescription = getSectionDescription(section["start"].toString(), section["end"].toString(), nbStops);
+        }
+
+
+        QString type = section["type"].toString();
+        m_colors.push_back(m_transportColor[type]);
+
         steps += type;
         steps += " - ";
 
         ui->fullDescription->setCurrentFont(QFont("Raleway", 13, 63));
-        ui->fullDescription->append(startTime + " : name");
-        ui->fullDescription->setCurrentFont(QFont("Raleway", 11));
-        ui->fullDescription->append("\t Faire ça pendant X minutes");
-
-        m_colors.push_back(m_transportColor[type]);
+        ui->fullDescription->append(section["start"].toString() + " : " + name);
+        ui->fullDescription->setCurrentFont(QFont("Raleway", 9));
+        ui->fullDescription->append("\t " + sectionDescription);
     }
-
-    file.close();
 
     steps.replace(steps.length()-2, 2, "");
 
-    QTime s = QTime::fromString(startTime, "h:mm");
-    QTime e = QTime::fromString(endTime, "h:mm");
-
-    QTime duration = e.addSecs(-(s.hour()*3600 + s.minute()*60));
-
-    ui->duration->setText(QString::number(duration.minute()) + " min");
+    ui->duration->setText(duration + " min");
     ui->timeSlot->setText(startTime + " - " + endTime);
     ui->steps->setText(steps);
-    ui->fullDescription->setCurrentFont(QFont("Raleway", 13, 63));
-    ui->fullDescription->append(endTime + " : name");
-    ui->fullDescription->setReadOnly(true);
-    ui->fullDescription->hide();
-    ui->line->hide();
 
+    setCriterias(criterias);
+
+    ui->fullDescription->setCurrentFont(QFont("Raleway", 13, 63));
+    ui->fullDescription->append(endTime + " : " + endName);
+    ui->fullDescription->setReadOnly(true);
+    hideMoreInfo();
 
     ui->frame->setStyleSheet("QWidget {background-color:lightgray}"
 
@@ -82,6 +81,68 @@ Itineraire::Itineraire(QString filename, QWidget *parent) :
 
                              "QLabel#steps {font: 17pt Abel}");
 }
+
+
+void Itineraire::setCriterias(QJsonObject criterias) {
+    QString distance = QString::number(criterias["distance"].toInt());
+    ui->distanceValue->setText(distance + " m");
+
+    QString heightDifference = QString::number(criterias["height"].toInt());
+    ui->heightDifferenceValue->setText(heightDifference + " m");
+
+    QString price = QString::number(criterias["price"].toDouble());
+    ui->priceValue->setText(price + " €");
+
+    QString co2 = QString::number(criterias["co2"].toDouble());
+    ui->co2Value->setText(co2 + " g");
+
+    QString effort = QString::number(criterias["effort"].toInt());
+    ui->effortValue->setText(effort + " kCal");
+
+    QString connections = QString::number(criterias["connections"].toInt());
+    ui->connectionsValue->setText(connections);
+}
+
+QString Itineraire::getSectionDescription(QString start, QString end, int nbStop) {
+    QString sectionDescription;
+
+    QTime startTime = QTime::fromString(start, "hh:mm");
+    QTime endTime = QTime::fromString(end, "hh:mm");
+    int minutes = qCeil(startTime.secsTo(endTime)/60.0);
+
+    if (nbStop == 0) {
+        sectionDescription += "Marcher pendant " + QString::number(minutes) + " minutes";
+    } else {
+        QString lineName = "Ligne B";
+        QString lineDirection = "Berge de la Garonne";
+        sectionDescription += lineName + " direction " + lineDirection;
+        sectionDescription += "\n\t" + QString::number(nbStop) + " arrêt(s) - " + QString::number(minutes) + " minute(s)";
+    }
+
+    return sectionDescription;
+}
+
+void Itineraire::getPath(QJsonArray nodes) {
+    QJsonArray path;
+
+    for (int i(0); i < nodes.size(); i++) {
+        qreal coordinates[2];
+        nodeAPI.getNodeCoordinates(qint64(nodes[i].toDouble()), coordinates);
+
+        if (coordinates[0] < 0 && coordinates[1] > 180.0)
+            continue;
+
+        QJsonObject point
+        {
+            {"latitude", coordinates[0]},
+            {"longitude", coordinates[1]}
+        };
+
+        path.push_back(point);
+    }
+    m_paths.push_back(path);
+}
+
 
 // SET TRANSPORT COLOR CODE
 QHash<QString, QString> Itineraire::initTransportColor() {
@@ -100,41 +161,6 @@ Itineraire::~Itineraire()
 }
 
 
-void Itineraire::getPath(QStringList nodes) {
-    QJsonArray path;
-
-    for (int i(0); i < nodes.length() ; i++) {
-        QStringList coordinates = getNodeCoordinate(nodes.at(i).toInt());
-        QJsonObject point
-        {
-            {"latitude", coordinates.at(0).toDouble()},
-            {"longitude", coordinates.at(1).toDouble()}
-        };
-        path.push_back(point);
-    }
-    m_paths.push_back(path);
-}
-
-
-QStringList Itineraire::getNodeCoordinate(int nodeId) {
-    QString filename = QDir::currentPath() + "/../TextFiles/nodes.txt";
-    QFile file(filename);
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return QStringList({"0","0"});
-
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QStringList nodeInfo = in.readLine().split(" ");
-        if (nodeInfo.at(0).toInt() == nodeId) {
-            nodeInfo.removeFirst();
-            return nodeInfo;
-        }
-    }
-
-    file.close();
-    return QStringList({"0","0"});
-}
 
 void Itineraire::mousePressEvent(QMouseEvent* e) {
     if(e->button() == Qt::LeftButton) {
@@ -142,6 +168,7 @@ void Itineraire::mousePressEvent(QMouseEvent* e) {
         (state) ? ui->fullDescription->show() : ui->fullDescription->hide();
         (state) ? ui->line->show() : ui->line->hide();
         (state) ? ui->line2->show() : ui->line2->hide();
+        (state) ? ui->criterias->show() : ui->line2->hide();
 
         (state) ? emit showMoreInfo(m_paths, m_colors, this) : hideMoreInfo();
     }
@@ -151,4 +178,5 @@ void Itineraire::hideMoreInfo() {
     ui->fullDescription->hide();
     ui->line->hide();
     ui->line2->hide();
+    ui->criterias->hide();
 }

@@ -1,0 +1,63 @@
+QLineEdit {
+	border: 2px solid white;
+	border-radius: 10px;
+    padding: 0 8px;
+    background-color: white
+}
+
+
+QPushButton#search, QPushButton#swap {
+    border: 2px solid #FFA543;
+    border-radius: 5px;
+    font: 14pt Abel;
+    background-color: #FFA543;
+    color: white
+}
+
+
+QLabel#start, QLabel#end, QLabel#criterias {
+    font: 14pt Abel
+}
+
+
+QLabel#depTime, QGroupBox#options, QGroupBox#privTrans {
+    font: 11pt Abel
+}
+
+ QScrollBar:vertical {
+     border-radius: 5px;
+     background: grey;
+     width: 10px;
+ }
+ 
+ QScrollBar::handle:vertical {
+     background: lightgrey;
+     border-radius: 5px;
+     min-height: 20px;
+}
+
+ QScrollBar::add-line:vertical {
+      border: none;
+      background: none;
+}
+
+QScrollBar::sub-line:vertical {
+      border: none;
+      background: none;
+}
+
+ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+     background: none;
+ }
+ 
+ 
+ QProgressBar {
+    border: Opx solid grey;
+    height: 5px;
+    padding: 0px;
+}
+
+QProgressBar::chunk {
+    background-color: grey;
+    border-radius: 1px;
+}

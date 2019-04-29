@@ -2,13 +2,16 @@
 #define INTERFACE_H
 
 #include <QMainWindow>
-#include <QGraphicsPixmapItem>
-#include "carte.h"
 #include "itineraire.h"
 #include <QVector>
 #include <QHash>
 #include <QJsonArray>
 #include <QStringList>
+#include <QJsonObject>
+#include <QNetworkReply>
+#include <nodeapirequest.h>
+
+#include <map>
 
 namespace Ui {
 class Interface;
@@ -21,18 +24,23 @@ class Interface : public QMainWindow
 public:
     explicit Interface(QWidget *parent = nullptr);
     ~Interface();
-    void addItineraries();
+    QJsonObject generateAlgorithmInput();
+    void clearItineraryList();
+    void getItineraryData();
+    void setItineraryList();
+    void displayItineraryList();
+    void emptyFile(QString filename);
 
 private slots:
     void on_swap_clicked();
     void on_search_clicked();
     void displayItinerary(QJsonArray, QStringList, Itineraire *);
-    void mouseCoordinates(QVariant, QVariant);
+    void displayMouseCoordinates(QVariant, QVariant);
 
 private:
     Ui::Interface *ui;
-    Carte * m_carte;
     QVector<Itineraire*> m_itineraires;
+    NodeAPIRequest nodeAPI;
 };
 
 #endif // INTERFACE_H

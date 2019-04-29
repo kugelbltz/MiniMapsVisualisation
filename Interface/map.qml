@@ -22,7 +22,7 @@ Item {
         plugin: mapPlugin
         //center: QtPositioning.coordinate(48.86, 2.35) // Paris
         center: QtPositioning.coordinate(44.83, -0.58) // BDX
-        zoomLevel: 13 // plus le chiffre est grand plus c'est zoomé
+        zoomLevel: 12.4 // plus le chiffre est grand plus c'est zoomé
 
         MapQuickItem {
             id: start
@@ -33,7 +33,7 @@ Item {
             anchorPoint.y: startImg.height - 5
             sourceItem: Image {
                 id: startImg
-                source: "qrc:/icons/Assets/marker48.png"
+                source: "qrc:/Icons/Ressources/marker48.png"
             }
         }
 
@@ -46,84 +46,39 @@ Item {
             anchorPoint.y: endImg.height - 5
             sourceItem: Image {
                 id: endImg
-                source: "qrc:/icons/Assets/marker48.png"
-            }
-        }
-
-        Rectangle {
-            color: "red"
-            height: 25
-            width: 25
-            radius:5
-            x:0
-            y:25
-
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true;
-                onHoveredChanged: { containsMouse ? parent.color = "lightsalmon" : parent.color = "red" }
-            }
-        }
-        Rectangle {
-            color: "blue"
-            height: 25
-            width: 25
-            radius:5
-            x:25
-            y:50
-
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true;
-                onHoveredChanged: { containsMouse ? parent.color = "cadetblue" : parent.color = "blue" }
-            }
-        }
-        Rectangle {
-            color: "green"
-            height: 25
-            width: 25
-            radius:5
-            x:25
-            y:0
-
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true;
-                onHoveredChanged: { containsMouse ? parent.color = "darkseagreen" : parent.color = "green" }
-            }
-        }
-        Rectangle {
-            id : right
-            color: "yellow"
-            height: 25
-            width: 25
-            radius:5
-            x:50
-            y:25
-
-            MouseArea {
-                anchors.fill: right
-                hoverEnabled: true;
-                onHoveredChanged: { containsMouse ? focus="true" : parent.color = "yellow" }
-                onClicked: {map.pan(100,0)}
+                source: "qrc:/Icons/Ressources/marker48.png"
             }
         }
 
         function loadSection(c, p) { // Ici il faudrait ajouter le type, comme ca on aura une variable globale qui fera correspondre le type de transport a une couleu
-            var component = Qt.createComponent("section.qml")
+            var component = Qt.createComponent("qrc:/Qml/section.qml")
             if (component.status === Component.Ready) {
                 var section = component.createObject(map)
-                section.line.color = c
-                section.path = p
-                map.addMapItem(section)
-            }
-        }
+                section.children[0].line.color = c
+                section.children[0].path = p
 
-        function loadRoute(paths) {
-            for (var i = 0; i < paths.length; i++) {
-                loadSection("red", paths[i])
+                // Centrer au milieu
+                var midLat = (p[0]["latitude"] + p[p.length-1]["latitude"])/2;
+                var midLon = (p[0]["longitude"] + p[p.length-1]["longitude"])/2;
+
+                map.center = QtPositioning.coordinate(midLat,midLon);
+                // Zoomer
+                var point1 = QtPositioning.coordinate(p[0]["latitude"], p[0]["longitude"]);
+                var point2 = QtPositioning.coordinate(p[p.length-1]["latitude"], p[p.length-1]["longitude"]);
+                var dist = point1.distanceTo(point2) + 100;
+
+                var myZoom = (dist + 7000) / 600;
+
+                map.zoomLevel = myZoom;
+                //var stops = section.createStops();
+
+                map.addMapItem(section.children[0])
+                for (var i = 0; i < stops.length; i++) {
+                    map.addMapItem(stops[i]);
+                }
+              }
             }
-        }
+
 
         function deleteRoute() {
             var len = map.mapItems.length

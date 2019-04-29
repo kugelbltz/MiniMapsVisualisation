@@ -1,2 +1,11 @@
 # Ignore
 build-Interface-Desktop_Qt_5_12_1_MinGW_64_bit-Debug
+Algo/bin
+Algo/data
+Algo/obj
+Data
+Interface/debug
+Interface/release
+Serveur/QuadTree
+Serveur/nodes.co
+TextFiles

@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>Interface</class>
  <widget class="QMainWindow" name="Interface">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -225,6 +228,38 @@
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
+              <widget class="QProgressBar" name="progressBar">
+               <property name="value">
+                <number>24</number>
+               </property>
+               <property name="textVisible">
+                <bool>false</bool>
+               </property>
+               <property name="invertedAppearance">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="status">
+               <property name="font">
+                <font>
+                 <family>Raleway</family>
+                 <pointsize>8</pointsize>
+                 <weight>50</weight>
+                 <italic>false</italic>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Status</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QWidget" name="techArea" native="true">
                <layout class="QVBoxLayout" name="verticalLayout_5">
                 <item>
@@ -294,12 +329,18 @@ font: 12pt &quot;Abel&quot;;</string>
     <property name="enabled">
      <bool>true</bool>
     </property>
+    <property name="maximumSize">
+     <size>
+      <width>16777207</width>
+      <height>16777215</height>
+     </size>
+    </property>
     <property name="title">
      <string>Icon</string>
     </property>
     <property name="icon">
      <iconset resource="ressources.qrc">
-      <normaloff>:/icons/Assets/icon.png</normaloff>:/icons/Assets/icon.png</iconset>
+      <normaloff>:/Icons/Ressources/icon.png</normaloff>:/Icons/Ressources/icon.png</iconset>
     </property>
    </widget>
    <addaction name="menuIcon"/>

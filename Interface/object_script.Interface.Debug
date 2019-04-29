@@ -1,0 +1,15 @@
+debug/interface.o
+debug/main.o
+debug/itineraire.o
+debug/nodeapirequest.o
+debug/Arc.o
+debug/Cost.o
+debug/functions.o
+debug/Graph.o
+debug/Label.o
+debug/Node.o
+debug/Position.o
+debug/Json.o
+debug/qrc_ressources.o
+debug/moc_interface.o
+debug/moc_itineraire.o

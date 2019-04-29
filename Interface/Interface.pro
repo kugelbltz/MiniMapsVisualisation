@@ -1,6 +1,8 @@
 QT += widgets \
     location \
-    quickwidgets
+    quickwidgets \
+    network \
+    core
 
 FORMS += \
     interface.ui \
@@ -8,18 +10,18 @@ FORMS += \
 
 HEADERS += \
     interface.h \
-    itineraire.h
+    itineraire.h \
+    nodeapirequest.h
 
 SOURCES += \
     interface.cpp \
     main.cpp \
-    itineraire.cpp
+    itineraire.cpp \
+    nodeapirequest.cpp \
 
 DISTFILES += \
     map.qml \
     section.qml \
-    nodes.txt \
-    path_1.txt
 
 RESOURCES += \
     ressources.qrc

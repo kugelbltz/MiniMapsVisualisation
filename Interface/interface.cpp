@@ -2,9 +2,9 @@
 #include "ui_interface.h"
 #include <QGraphicsPixmapItem>
 #include <iostream>
+#include <fstream>
 #include "itineraire.h"
 #include <QDir>
-#include "carte.h"
 #include <QQuickView>
 #include <QMetaObject>
 #include <QVariant>
@@ -15,6 +15,12 @@
 #include <QQmlContext>
 #include <QQuickItem>
 #include <QHash>
+#include <QJsonDocument>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QEventLoop>
+#include <QProcess>
+
 
 using namespace std;
 
@@ -24,30 +30,24 @@ Interface::Interface(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->testMap->setSource(QUrl::fromLocalFile("../Interface/map.qml"));
+    ui->testMap->setSource(QUrl("qrc:/Qml/map.qml"));
     QObject * object = ui->testMap->rootObject();
-    QObject::connect(object, SIGNAL(mapPressed(QVariant, QVariant)), this, SLOT(mouseCoordinates(QVariant, QVariant)));
-
-
+    QObject::connect(object, SIGNAL(mapPressed(QVariant, QVariant)), this, SLOT(displayMouseCoordinates(QVariant, QVariant)));
 
     /* LEAVE AT */
     ui->depTimeEdit->setTime(QTime::currentTime());
 
-    ui->centralwidget->setStyleSheet("QLineEdit {border: 2px solid white;"
-                                     "border-radius: 10px;"
-                                     "padding: 0 8px;"
-                                     "background-color: white}"
+    ui->status->hide();
+    ui->progressBar->hide();
 
-                                     "QPushButton#search, QPushButton#swap {border: 2px solid #FFA543;"
-                                     "border-radius: 5px;"
-                                     "font: 14pt Abel;"
-                                     "background-color: #FFA543;"
-                                     "color: white}"
 
-                                     "QLabel#start, QLabel#end, QLabel#criterias {font: 14pt Abel}"
+    /* ALGO */
+    /*
+    QString graph_file(QDir::currentPath() + "/../TextFiles/graphWalk.cr");
+    QString nodes_file(QDir::currentPath() + "/../Tests/nodes.co");
 
-                                     "QLabel#depTime, QGroupBox#options, QGroupBox#privTrans {font: 11pt Abel}"
-                                     );
+    init_graph_complete(m_graph, m_nodes, graph_file.toStdString(), nodes_file.toStdString());
+    */
 }
 
 Interface::~Interface()
@@ -56,90 +56,101 @@ Interface::~Interface()
 }
 
 
-void Interface::addItineraries() {
-    // Enlever les itineraires
-    // il faut enlever les fichiers itineraires aussi !!!
-    //deconnexion du signal aussi !
+void Interface::clearItineraryList() {
     for (int i(0); i < m_itineraires.length(); i++) {
         ui->itineraryLayout->removeWidget(m_itineraires.at(i));
+        disconnect(m_itineraires.at(i), SIGNAL(showMoreInfo(QJsonArray, QStringList, Itineraire *)),
+                   this, SLOT(displayItinerary(QJsonArray, QStringList, Itineraire *)));
         delete m_itineraires.at(i);
     }
     m_itineraires.clear();
+}
 
-    // Recuperer les entrées et sorties
-    QString start = ui->startEdit->text();
-    QString end = ui->endEdit->text();
+void Interface::getItineraryData() {
+    ui->progressBar->setValue(20);
+    ui->status->setText("Generating algorithm input");
 
-    // Les envoyer au calculateur d'itinéraire et récuperer le nombre d'itinéraires
-    // generayion des fichiers itineraires
+    ui->progressBar->setValue(40);
+    ui->status->setText("Calculating itineraries");
 
-    /* ENVOIE DES DONNEES */
+    QJsonObject input = generateAlgorithmInput();
+    qDebug() << input;
 
-    bool price = ui->price->isChecked();
-    bool connections = ui->connections->isChecked();
-    bool co2 = ui->co2->isChecked();
-    bool effort = ui->effort->isChecked();
-    int startNode = 5;
-    int endNode = 12;
-    QString startTime = ui->depTimeEdit->time().toString("HH:mm");
-    QString mode;
+    qint64 start_node = qint64(input["start"].toDouble());
+    qint64 end_node = qint64(input["dest"].toDouble());
 
-    if (ui->walking->isChecked())
-        mode = "walk";
-    else if (ui->bike->isChecked())
-        mode = "bike";
-    else
-        mode = "car";
+    QStringList arguments = {QDir::currentPath() + "/../TextFiles/graphWalk.cr",
+                            QDir::currentPath() + "/../Serveur/nodes.co",
+                            QDir::currentPath() + "/../TextFiles/userInput.json",
+                            QDir::currentPath() + "/../TextFiles/output.json",
+                            QString::number(start_node),
+                            QString::number(end_node)};
 
+    emptyFile(QDir::currentPath() + "/../TextFiles/output.json");
 
-    QJsonObject data {
-        {"criterias", QJsonObject {
-                {"price", price},
-                {"connections", connections},
-                {"co2", co2},
-                {"effort", effort}
-            }
-        },
-        {"start", startNode},
-        {"dest", endNode},
-        {"startTime", startTime},
-        {"mode", mode}
-    };
+    QProcess itineraryCalculator;
+    itineraryCalculator.start(QDir::currentPath() + "/../Algo/bin/Debug/Algo.exe", arguments);
+    itineraryCalculator.waitForFinished(-1);
+}
 
-    qDebug() << data;
+void Interface::setItineraryList() {
 
-    int n(3);
-    //int n = algo(data)
+    QString jSonFileStr;
+    QFile jSonFile(QDir::currentPath() + "/../TextFiles/output.json");
+    jSonFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    jSonFileStr = jSonFile.readAll();
+    jSonFile.close();
 
+    QJsonDocument jSonDocument = QJsonDocument::fromJson(jSonFileStr.toUtf8());
+    QJsonObject itineraires = jSonDocument.object();
+    QJsonArray it = itineraires["itineraries"].toArray();
 
-    for (int i(1); i <= n; i++) {
-        QString filename = QDir::currentPath() + "/../TextFiles/path_" + QString::number(i) + ".txt";
-        m_itineraires.push_back(new Itineraire(filename));
-    }
+    int n = itineraires["nb_itineraries"].toInt();
+
 
     for (int i(0); i < n; i++) {
+        QJsonObject itinerary = it[i].toObject();
+        m_itineraires.push_back(new Itineraire(itinerary));
         connect(m_itineraires.at(i), SIGNAL(showMoreInfo(QJsonArray, QStringList, Itineraire *)), this, SLOT(displayItinerary(QJsonArray, QStringList, Itineraire *)));
     }
+}
 
-    // C'est là qu'on fait appelle a la partie algo.
-
-
+void Interface::displayItineraryList() {
     ui->techArea->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-
-    for (int i(0); i < n ; i++) {
+    for (int i(0); i < m_itineraires.length() ; i++) {
         ui->techLayout->insertWidget(i,m_itineraires.at(i));
     }
 }
 
-void Interface::on_swap_clicked() {
-    QString temp = ui->startEdit->text();
-    ui->startEdit->setText(ui->endEdit->text());
-    ui->endEdit->setText(temp);
+void Interface::on_search_clicked() {
+    if (ui->endEdit->text().isEmpty() || ui->startEdit->text().isEmpty())
+        return;
+
+    ui->search->setDisabled(true);
+
+    ui->status->show();
+    ui->progressBar->show();
+
+    ui->status->setText("Clearing previous list");
+    ui->progressBar->setValue(0);
+
+    clearItineraryList();
+    getItineraryData();
+    setItineraryList();
+
+    ui->progressBar->setValue(80);
+    ui->status->setText("Done !");
+
+    ui->search->setDisabled(false);
+    displayItineraryList();
+    ui->progressBar->setValue(100);
+
+    //ui->status->hide();
+    //ui->progressBar->hide();
 }
 
-void Interface::on_search_clicked() {
-    if (!ui->endEdit->text().isEmpty()&&!ui->startEdit->text().isEmpty())
-        addItineraries();
+void Interface::on_swap_clicked() {
+
 }
 
 void Interface::displayItinerary(QJsonArray paths, QStringList colors, Itineraire * itinerary) {
@@ -149,7 +160,6 @@ void Interface::displayItinerary(QJsonArray paths, QStringList colors, Itinerair
             m_itineraires.at(i)->hideMoreInfo();
         }
     }
-
 
     QVariant returnedValue;
     QObject * object = ui->testMap->rootObject()->findChild<QObject*>("mapObject");
@@ -165,7 +175,7 @@ void Interface::displayItinerary(QJsonArray paths, QStringList colors, Itinerair
     }
 }
 
-void Interface::mouseCoordinates(QVariant lat, QVariant lon) {
+void Interface::displayMouseCoordinates(QVariant lat, QVariant lon) {
     bool s = ui->startEdit->text().isEmpty();
     bool e = ui->endEdit->text().isEmpty();
 
@@ -178,4 +188,65 @@ void Interface::mouseCoordinates(QVariant lat, QVariant lon) {
     else {
         ui->endEdit->setText(lat.toString() + ", " + lon.toString());
     }
+}
+
+QJsonObject Interface::generateAlgorithmInput() {
+    bool includePrice = ui->price->isChecked();
+    bool includeConnections = ui->connections->isChecked();
+    bool includeCo2 = ui->co2->isChecked();
+    bool includeEffort = ui->effort->isChecked();
+
+    QStringList mouseCord = ui->startEdit->text().split(", ");
+    qint64 startNodeId = nodeAPI.getNearestNodeId(mouseCord[0].toDouble(), mouseCord[1].toDouble());
+
+    mouseCord = ui->endEdit->text().split(", ");
+    qint64 endNodeId = nodeAPI.getNearestNodeId(mouseCord[0].toDouble(), mouseCord[1].toDouble());
+
+    QString departureTime = ui->depTimeEdit->time().toString("HH:mm");
+    QString privateTransportMode;
+
+    if (ui->walking->isChecked())
+        privateTransportMode = "walking";
+    else if (ui->bike->isChecked())
+        privateTransportMode = "bike";
+    else
+        privateTransportMode = "car";
+
+
+    QJsonObject data {
+        {"criterias", QJsonObject {
+                {"price", includePrice},
+                {"connections", includeConnections},
+                {"co2", includeCo2},
+                {"effort", includeEffort}
+            }
+        },
+        {"start", startNodeId},
+        {"dest", endNodeId},
+        {"startTime", departureTime},
+        {"mode", privateTransportMode}
+    };
+
+    emptyFile(QDir::currentPath() + "/../TextFiles/userInput.json");
+    QFile jSonFile(QDir::currentPath() + "/../TextFiles/userInput.json");
+    if (jSonFile.open(QIODevice::ReadWrite)) {
+            QTextStream stream(&jSonFile);
+            QJsonDocument doc(data);
+            QString strJson(doc.toJson(QJsonDocument::Indented));
+            stream << strJson << endl;
+     }
+    jSonFile.close();
+
+
+
+    return data;
+}
+
+void Interface::emptyFile(QString filename) {
+    QFile toDelete(filename);
+    toDelete.remove();
+
+    QFile emptiedFile(filename);
+    emptiedFile.open(QIODevice::ReadWrite);
+    emptiedFile.close();
 }

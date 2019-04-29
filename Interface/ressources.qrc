@@ -1,7 +1,13 @@
 <RCC>
-    <qresource prefix="/icons">
-        <file>Assets/logo.png</file>
-        <file>Assets/marker48.png</file>
-        <file>Assets/icon.png</file>
+    <qresource prefix="/Icons">
+        <file>Ressources/icon.png</file>
+        <file>Ressources/marker48.png</file>
+    </qresource>
+    <qresource prefix="/Stylesheets">
+        <file>Ressources/stylesheet.txt</file>
+    </qresource>
+    <qresource prefix="/Qml">
+        <file>map.qml</file>
+        <file>section.qml</file>
     </qresource>
 </RCC>

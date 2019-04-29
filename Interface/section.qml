@@ -2,23 +2,28 @@ import QtQuick 2.12
 import QtLocation 5.6
 import QtPositioning 5.6
 
+Item {
+    id: theObject;
+
     MapPolyline {
-            line.width: 3
-            //line.color: "steelblue"
-            /*
-            path: [
-                { latitude: -27, longitude: 153.0 },
-                { latitude: -27, longitude: 154.1 },
-                { latitude: -28, longitude: 153.5 },
-                { latitude: -29, longitude: 153.5 }
-            ]
-            */
+        id: polyLine;
+        objectName: "polyLineName";
+        line.width: 3;
+    }
 
-            MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true;
-                    onHoveredChanged: { containsMouse ? parent.line.width = 10 : parent.line.width = 3 }
-                }
+    function createStops() {
+        var stops = [];
+        var path = polyLine.path;
+        for (var i = 0; i < path.length ; i++) {
+            var lat = path[i]["latitude"];
+            var lon = path[i]["longitude"];
+            var color = polyLine.line.color;
 
+            var qml = "import QtQuick 2.0; import QtLocation 5.6; import QtPositioning 5.6; MapCircle { radius: 10; border.width: 0; color: \""+color+"\"; center: QtPositioning.coordinate("+ lat + ", "+ lon +");}"
 
+            var stop = Qt.createQmlObject(qml, theObject);
+            stops.push(stop);
         }
+        return stops;
+    }
+}
