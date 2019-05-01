@@ -113,7 +113,7 @@ QString Itineraire::getSectionDescription(QString start, QString end, int nbStop
     int minutes = qCeil(startTime.secsTo(endTime)/60.0);
 
     if (nbStop == 0) {
-        sectionDescription += "Marcher pendant " + QString::number(minutes) + " minutes";
+        sectionDescription += "Walk for " + QString::number(minutes) + " minutes";
     } else {
         QString lineName = "Ligne B";
         QString lineDirection = "Berge de la Garonne";

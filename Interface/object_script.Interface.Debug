@@ -4,12 +4,12 @@ debug/itineraire.o
 debug/nodeapirequest.o
 debug/Arc.o
 debug/Cost.o
-debug/functions.o
 debug/Graph.o
+debug/Json.o
 debug/Label.o
 debug/Node.o
 debug/Position.o
-debug/Json.o
+debug/functions.o
 debug/qrc_ressources.o
 debug/moc_interface.o
 debug/moc_itineraire.o

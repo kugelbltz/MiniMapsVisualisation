@@ -4,12 +4,12 @@ release/itineraire.o
 release/nodeapirequest.o
 release/Arc.o
 release/Cost.o
-release/functions.o
 release/Graph.o
+release/Json.o
 release/Label.o
 release/Node.o
 release/Position.o
-release/Json.o
+release/functions.o
 release/qrc_ressources.o
 release/moc_interface.o
 release/moc_itineraire.o

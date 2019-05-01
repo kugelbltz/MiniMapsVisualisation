@@ -21,6 +21,8 @@
 #include <QEventLoop>
 #include <QProcess>
 
+#include "AlgoSources/functions.h"
+
 
 using namespace std;
 
@@ -42,12 +44,13 @@ Interface::Interface(QWidget *parent) :
 
 
     /* ALGO */
-    /*
-    QString graph_file(QDir::currentPath() + "/../TextFiles/graphWalk.cr");
-    QString nodes_file(QDir::currentPath() + "/../Tests/nodes.co");
 
+    QString graph_file("Data/graphWalk.cr");
+    QString nodes_file("Data/nodes.co");
+
+    qDebug() << "Initializing graph";
     init_graph_complete(m_graph, m_nodes, graph_file.toStdString(), nodes_file.toStdString());
-    */
+    qDebug() << "Graph completed";
 }
 
 Interface::~Interface()
@@ -60,7 +63,7 @@ void Interface::clearItineraryList() {
     for (int i(0); i < m_itineraires.length(); i++) {
         ui->itineraryLayout->removeWidget(m_itineraires.at(i));
         disconnect(m_itineraires.at(i), SIGNAL(showMoreInfo(QJsonArray, QStringList, QList<bool>,Itineraire *)),
-                   this, SLOT(displayItinerary(QJsonArray, QStringList, Itineraire *)));
+                   this, SLOT(displayItinerary(QJsonArray, QStringList, QList<bool>, Itineraire *)));
         delete m_itineraires.at(i);
     }
     m_itineraires.clear();
@@ -76,6 +79,8 @@ void Interface::getItineraryData() {
     QJsonObject input = generateAlgorithmInput();
     qDebug() << input;
 
+
+
     qint64 start_node = qint64(input["start"].toDouble());
     qint64 end_node = qint64(input["dest"].toDouble());
 
@@ -86,9 +91,22 @@ void Interface::getItineraryData() {
                             QString::number(start_node),
                             QString::number(end_node)};
 
+    QString result = QString::fromStdString(Namoa(m_graph, m_nodes, start_node, end_node));
+
+    QFile jSonFile("Data/output.json");
+    if (jSonFile.open(QIODevice::ReadWrite|QIODevice::Truncate)) {
+            QTextStream stream(&jSonFile);
+            QJsonDocument doc = QJsonDocument::fromJson(result.toUtf8());
+            QString strJson(doc.toJson(QJsonDocument::Indented));
+            stream << strJson << endl;
+     }
+    jSonFile.close();
+
+    /*
     QProcess itineraryCalculator;
     itineraryCalculator.start(QDir::currentPath() + "/../Algo/bin/Debug/Algo.exe", arguments);
     itineraryCalculator.waitForFinished(-1);
+    */
 
 }
 

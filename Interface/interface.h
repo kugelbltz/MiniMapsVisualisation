@@ -12,6 +12,9 @@
 #include <nodeapirequest.h>
 
 #include <map>
+#include "AlgoSources/Arc.h"
+#include "AlgoSources/Graph.h"
+#include "AlgoSources/Position.h"
 
 namespace Ui {
 class Interface;
@@ -40,6 +43,9 @@ private:
     Ui::Interface *ui;
     QVector<Itineraire*> m_itineraires;
     NodeAPIRequest nodeAPI;
+
+    Graph m_graph;
+    std::map<long long, Position> m_nodes;
 };
 
 #endif // INTERFACE_H
