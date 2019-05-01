@@ -59,7 +59,7 @@ Interface::~Interface()
 void Interface::clearItineraryList() {
     for (int i(0); i < m_itineraires.length(); i++) {
         ui->itineraryLayout->removeWidget(m_itineraires.at(i));
-        disconnect(m_itineraires.at(i), SIGNAL(showMoreInfo(QJsonArray, QStringList, Itineraire *)),
+        disconnect(m_itineraires.at(i), SIGNAL(showMoreInfo(QJsonArray, QStringList, QList<bool>,Itineraire *)),
                    this, SLOT(displayItinerary(QJsonArray, QStringList, Itineraire *)));
         delete m_itineraires.at(i);
     }
@@ -89,6 +89,7 @@ void Interface::getItineraryData() {
     QProcess itineraryCalculator;
     itineraryCalculator.start(QDir::currentPath() + "/../Algo/bin/Debug/Algo.exe", arguments);
     itineraryCalculator.waitForFinished(-1);
+
 }
 
 void Interface::setItineraryList() {
@@ -109,7 +110,7 @@ void Interface::setItineraryList() {
     for (int i(0); i < n; i++) {
         QJsonObject itinerary = it[i].toObject();
         m_itineraires.push_back(new Itineraire(itinerary));
-        connect(m_itineraires.at(i), SIGNAL(showMoreInfo(QJsonArray, QStringList, Itineraire *)), this, SLOT(displayItinerary(QJsonArray, QStringList, Itineraire *)));
+        connect(m_itineraires.at(i), SIGNAL(showMoreInfo(QJsonArray, QStringList, QList<bool>, Itineraire *)), this, SLOT(displayItinerary(QJsonArray, QStringList, QList<bool>,Itineraire *)));
     }
 }
 
@@ -157,7 +158,7 @@ void Interface::on_swap_clicked() {
 
 }
 
-void Interface::displayItinerary(QJsonArray paths, QStringList colors, Itineraire * itinerary) {
+void Interface::displayItinerary(QJsonArray paths, QStringList colors, QList<bool> isSectionPublic, Itineraire * itinerary) {
 
     for (int i(0); i < m_itineraires.length(); i++) {
         if (itinerary != m_itineraires.at(i)) {
@@ -172,7 +173,7 @@ void Interface::displayItinerary(QJsonArray paths, QStringList colors, Itinerair
     for (int i(0); i < paths.size(); i++) {
         QVariant path = paths.at(i);
         QVariant color = colors.at(i);
-        QVariant isPublic = false;
+        QVariant isPublic = isSectionPublic.at(i);
         QMetaObject::invokeMethod(object, "loadSection",
                                   Q_RETURN_ARG(QVariant, returnedValue),
                                   Q_ARG(QVariant, color),

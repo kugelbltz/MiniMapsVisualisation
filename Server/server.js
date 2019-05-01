@@ -283,6 +283,7 @@ reader.on('end', function () {
         let closestNodeId = {
             id: id
         };
+        console.log(closestNodeId);
         res.send(closestNodeId);
     });
 

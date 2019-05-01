@@ -32,12 +32,13 @@ private:
     Ui::Itineraire *ui;
     QJsonArray m_paths;
     QStringList m_colors;
+    QList<bool> m_isSectionPublic;
     static QHash<QString, QString> m_transportColor;
     NodeAPIRequest nodeAPI;
 
 
 signals:
-    void showMoreInfo(QJsonArray, QStringList, Itineraire *);
+    void showMoreInfo(QJsonArray, QStringList, QList<bool>,Itineraire *);
 };
 
 #endif // ITINERAIRE_H

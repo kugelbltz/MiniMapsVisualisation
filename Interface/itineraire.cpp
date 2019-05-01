@@ -49,6 +49,9 @@ Itineraire::Itineraire(QJsonObject description, QWidget *parent)  :
         QString type = section["type"].toString();
         m_colors.push_back(m_transportColor[type]);
 
+        bool isPublic = section["public"].toBool();
+        m_isSectionPublic.push_back(isPublic);
+
         steps += type;
         steps += " - ";
 
@@ -169,7 +172,7 @@ void Itineraire::mousePressEvent(QMouseEvent* e) {
         (state) ? ui->line2->show() : ui->line2->hide();
         (state) ? ui->criterias->show() : ui->line2->hide();
 
-        (state) ? emit showMoreInfo(m_paths, m_colors, this) : hideMoreInfo();
+        (state) ? emit showMoreInfo(m_paths, m_colors, m_isSectionPublic, this) : hideMoreInfo();
     }
 }
 

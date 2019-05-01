@@ -112,16 +112,9 @@ compiler_rcc_clean:
 	-$(DEL_FILE) release/qrc_ressources.cpp
 release/qrc_ressources.cpp: ressources.qrc \
 		C:/Qt/5.12.1/mingw73_64/bin/rcc.exe \
-		Ressources/icon.png \
-		Ressources/marker48.png \
-		Data/userInput.json \
-		Data/graphWalk.cr \
-		Data/nodes.co \
-		Data/output.json \
 		Images/icon.png \
 		Images/marker48.png \
 		Stylesheets/interfaceStylesheet.txt \
-		Ressources/stylesheet.txt \
 		section.qml \
 		map.qml
 	'C:\Qt\5.12.1\mingw73_64\bin\rcc.exe' -name ressources ressources.qrc -o release/qrc_ressources.cpp

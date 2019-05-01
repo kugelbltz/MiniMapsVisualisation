@@ -63,6 +63,7 @@ Item {
 
                 map.center = QtPositioning.coordinate(midLat,midLon);
                 // Zoomer
+                /*
                 var point1 = QtPositioning.coordinate(p[0]["latitude"], p[0]["longitude"]);
                 var point2 = QtPositioning.coordinate(p[p.length-1]["latitude"], p[p.length-1]["longitude"]);
                 var dist = point1.distanceTo(point2) + 100;
@@ -70,15 +71,15 @@ Item {
                 var myZoom = (dist + 7000) / 600;
 
                 map.zoomLevel = myZoom;
-
+                */
                 if (isPublic) {
                     var stops = section.createStops();
-
-                    map.addMapItem(section.children[0])
                     for (var i = 0; i < stops.length; i++) {
                         map.addMapItem(stops[i]);
                     }
                 }
+                    map.addMapItem(section.children[0])
+
               }
             }
 

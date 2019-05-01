@@ -33,7 +33,7 @@ public:
 private slots:
     void on_swap_clicked();
     void on_search_clicked();
-    void displayItinerary(QJsonArray, QStringList, Itineraire *);
+    void displayItinerary(QJsonArray, QStringList, QList<bool>, Itineraire *);
     void displayMouseCoordinates(QVariant, QVariant);
 
 private:

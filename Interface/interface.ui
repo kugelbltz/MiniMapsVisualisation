@@ -340,7 +340,7 @@ font: 12pt &quot;Abel&quot;;</string>
     </property>
     <property name="icon">
      <iconset resource="ressources.qrc">
-      <normaloff>:/Icons/Ressources/icon.png</normaloff>:/Icons/Ressources/icon.png</iconset>
+      <normaloff>:/Images/icon.png</normaloff>:/Images/icon.png</iconset>
     </property>
    </widget>
    <addaction name="menuIcon"/>

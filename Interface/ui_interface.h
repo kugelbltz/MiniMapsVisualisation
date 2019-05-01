@@ -317,7 +317,7 @@ public:
         menuIcon->setEnabled(true);
         menuIcon->setMaximumSize(QSize(16777207, 16777215));
         QIcon icon;
-        icon.addFile(QString::fromUtf8(":/Icons/Ressources/icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8(":/Images/icon.png"), QSize(), QIcon::Normal, QIcon::Off);
         menuIcon->setIcon(icon);
         Interface->setMenuBar(menubar);
         statusbar = new QStatusBar(Interface);
