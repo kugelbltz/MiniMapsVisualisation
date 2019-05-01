@@ -33,7 +33,7 @@ Item {
             anchorPoint.y: startImg.height - 5
             sourceItem: Image {
                 id: startImg
-                source: "qrc:/Icons/Ressources/marker48.png"
+                source: "qrc:/Images/marker48.png"
             }
         }
 
@@ -46,11 +46,11 @@ Item {
             anchorPoint.y: endImg.height - 5
             sourceItem: Image {
                 id: endImg
-                source: "qrc:/Icons/Ressources/marker48.png"
+                source: "qrc:/Images/marker48.png"
             }
         }
 
-        function loadSection(c, p) { // Ici il faudrait ajouter le type, comme ca on aura une variable globale qui fera correspondre le type de transport a une couleu
+        function loadSection(c, p, isPublic) {
             var component = Qt.createComponent("qrc:/Qml/section.qml")
             if (component.status === Component.Ready) {
                 var section = component.createObject(map)
@@ -70,11 +70,14 @@ Item {
                 var myZoom = (dist + 7000) / 600;
 
                 map.zoomLevel = myZoom;
-                //var stops = section.createStops();
 
-                map.addMapItem(section.children[0])
-                for (var i = 0; i < stops.length; i++) {
-                    map.addMapItem(stops[i]);
+                if (isPublic) {
+                    var stops = section.createStops();
+
+                    map.addMapItem(section.children[0])
+                    for (var i = 0; i < stops.length; i++) {
+                        map.addMapItem(stops[i]);
+                    }
                 }
               }
             }

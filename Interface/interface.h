@@ -29,7 +29,6 @@ public:
     void getItineraryData();
     void setItineraryList();
     void displayItineraryList();
-    void emptyFile(QString filename);
 
 private slots:
     void on_swap_clicked();

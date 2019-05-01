@@ -1,13 +1,11 @@
 <RCC>
-    <qresource prefix="/Icons">
-        <file>Ressources/icon.png</file>
-        <file>Ressources/marker48.png</file>
-    </qresource>
-    <qresource prefix="/Stylesheets">
-        <file>Ressources/stylesheet.txt</file>
-    </qresource>
     <qresource prefix="/Qml">
         <file>map.qml</file>
         <file>section.qml</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>Images/icon.png</file>
+        <file>Images/marker48.png</file>
+        <file>Stylesheets/interfaceStylesheet.txt</file>
     </qresource>
 </RCC>

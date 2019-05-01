@@ -39,13 +39,12 @@ Itineraire::Itineraire(QJsonObject description, QWidget *parent)  :
         getPath(section["nodes"].toArray());
 
         QString sectionDescription;
-        if (section["public"].toBool()) {
+        if (!section["public"].toBool()) {
             sectionDescription = getSectionDescription(section["start"].toString(), section["end"].toString());
         } else {
             int nbStops = section["nodes"].toArray().size();
             sectionDescription = getSectionDescription(section["start"].toString(), section["end"].toString(), nbStops);
         }
-
 
         QString type = section["type"].toString();
         m_colors.push_back(m_transportColor[type]);

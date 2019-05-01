@@ -79,14 +79,12 @@ void Interface::getItineraryData() {
     qint64 start_node = qint64(input["start"].toDouble());
     qint64 end_node = qint64(input["dest"].toDouble());
 
-    QStringList arguments = {QDir::currentPath() + "/../TextFiles/graphWalk.cr",
-                            QDir::currentPath() + "/../Serveur/nodes.co",
-                            QDir::currentPath() + "/../TextFiles/userInput.json",
-                            QDir::currentPath() + "/../TextFiles/output.json",
+    QStringList arguments = {"Data/graphWalk.cr",
+                            "Data/nodes.co",
+                            "Data/userInput.json",
+                            "Data/output.json",
                             QString::number(start_node),
                             QString::number(end_node)};
-
-    emptyFile(QDir::currentPath() + "/../TextFiles/output.json");
 
     QProcess itineraryCalculator;
     itineraryCalculator.start(QDir::currentPath() + "/../Algo/bin/Debug/Algo.exe", arguments);
@@ -96,7 +94,7 @@ void Interface::getItineraryData() {
 void Interface::setItineraryList() {
 
     QString jSonFileStr;
-    QFile jSonFile(QDir::currentPath() + "/../TextFiles/output.json");
+    QFile jSonFile("Data/output.json");
     jSonFile.open(QIODevice::ReadOnly | QIODevice::Text);
     jSonFileStr = jSonFile.readAll();
     jSonFile.close();
@@ -139,7 +137,13 @@ void Interface::on_search_clicked() {
     setItineraryList();
 
     ui->progressBar->setValue(80);
-    ui->status->setText("Done !");
+
+    if (m_itineraires.size() == 0) {
+        ui->status->setText("Sorry, we could not find any itinerary...");
+    } else {
+        ui->status->setText("Done !");
+    }
+
 
     ui->search->setDisabled(false);
     displayItineraryList();
@@ -168,10 +172,12 @@ void Interface::displayItinerary(QJsonArray paths, QStringList colors, Itinerair
     for (int i(0); i < paths.size(); i++) {
         QVariant path = paths.at(i);
         QVariant color = colors.at(i);
+        QVariant isPublic = false;
         QMetaObject::invokeMethod(object, "loadSection",
                                   Q_RETURN_ARG(QVariant, returnedValue),
                                   Q_ARG(QVariant, color),
-                                  Q_ARG(QVariant, path));
+                                  Q_ARG(QVariant, path),
+                                  Q_ARG(QVariant, isPublic));
     }
 }
 
@@ -227,9 +233,8 @@ QJsonObject Interface::generateAlgorithmInput() {
         {"mode", privateTransportMode}
     };
 
-    emptyFile(QDir::currentPath() + "/../TextFiles/userInput.json");
-    QFile jSonFile(QDir::currentPath() + "/../TextFiles/userInput.json");
-    if (jSonFile.open(QIODevice::ReadWrite)) {
+    QFile jSonFile("Data/userInput.json");
+    if (jSonFile.open(QIODevice::ReadWrite|QIODevice::Truncate)) {
             QTextStream stream(&jSonFile);
             QJsonDocument doc(data);
             QString strJson(doc.toJson(QJsonDocument::Indented));
@@ -240,13 +245,4 @@ QJsonObject Interface::generateAlgorithmInput() {
 
 
     return data;
-}
-
-void Interface::emptyFile(QString filename) {
-    QFile toDelete(filename);
-    toDelete.remove();
-
-    QFile emptiedFile(filename);
-    emptiedFile.open(QIODevice::ReadWrite);
-    emptiedFile.close();
 }
