@@ -25,7 +25,7 @@ public:
     static QHash<QString, QString> initTransportColor();
     void mousePressEvent(QMouseEvent*);
     void hideMoreInfo();
-    QString getSectionDescription(QString start, QString end, int nbStop = 0);
+    QString getSectionDescription(QString start, QString end, int nbStop = 0, int routeId = 0);
     void setCriterias(QJsonObject criterias);
 
 private:

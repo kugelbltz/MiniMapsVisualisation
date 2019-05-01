@@ -50,6 +50,20 @@ Item {
             }
         }
 
+        MapRectangle {
+                color: 'transparent'
+                border.width: 2
+                border.color: 'red'
+                bottomRight {
+                    latitude: 44.776
+                    longitude: -0.481
+                }
+                topLeft {
+                    latitude: 44.903
+                    longitude: -0.687
+                }
+        }
+
         function loadSection(c, p, isPublic) {
             var component = Qt.createComponent("qrc:/Qml/section.qml")
             if (component.status === Component.Ready) {
@@ -86,8 +100,8 @@ Item {
 
         function deleteRoute() {
             var len = map.mapItems.length
-            for (var i = 2; i < len; i++) {
-                map.removeMapItem(map.mapItems[2]);
+            for (var i = 3; i < len; i++) {
+                map.removeMapItem(map.mapItems[3]);
             }
         }
 

@@ -38,6 +38,19 @@ QString NodeAPIRequest::getNodeName(qint64 nodeId) {
     }
 }
 
+QStringList NodeAPIRequest::getRouteInfo(int routeId) {
+    QString url = "http://localhost:8000/route/" + QString::number(routeId);
+    QJsonObject reply = nodeAPIGetRequest(url);
+
+    QStringList info;
+
+    info.push_back(reply["type"].toString());
+    info.push_back(reply["name"].toString());
+    info.push_back(reply["destination"].toString());
+
+    return info;
+}
+
 void NodeAPIRequest::getNodeCoordinates(qint64 nodeId, qreal nodeCoordinate[2]) {
     QString url = "http://localhost:8000/coord/" + QString::number(nodeId);
     QJsonObject reply = nodeAPIGetRequest(url);

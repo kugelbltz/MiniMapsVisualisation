@@ -38,7 +38,6 @@ int main(int argc, char * argv[]) {
     QString stylesheet = in.readAll();
     qApp->setStyleSheet(stylesheet);
 
-
     Interface fenetre;
     fenetre.showMaximized();
 

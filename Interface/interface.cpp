@@ -84,6 +84,12 @@ void Interface::getItineraryData() {
     qint64 start_node = qint64(input["start"].toDouble());
     qint64 end_node = qint64(input["dest"].toDouble());
 
+//    if (start_node == 0 || end_node == 0) {
+//        ui->status->setText("Could not find node");
+//        //should send a signal
+//        return;
+//    }
+
     QStringList arguments = {"Data/graphWalk.cr",
                             "Data/nodes.co",
                             "Data/userInput.json",
@@ -260,8 +266,6 @@ QJsonObject Interface::generateAlgorithmInput() {
             stream << strJson << endl;
      }
     jSonFile.close();
-
-
 
     return data;
 }

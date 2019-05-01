@@ -25,7 +25,7 @@
 
 #include <QDebug>
 
-#define ELAPSED_TIME      //uncomment to print the elapsed time of the algorithm
+//#define ELAPSED_TIME      //uncomment to print the elapsed time of the algorithm
 
 
 using namespace std;

@@ -43,7 +43,8 @@ Itineraire::Itineraire(QJsonObject description, QWidget *parent)  :
             sectionDescription = getSectionDescription(section["start"].toString(), section["end"].toString());
         } else {
             int nbStops = section["nodes"].toArray().size();
-            sectionDescription = getSectionDescription(section["start"].toString(), section["end"].toString(), nbStops);
+            int routeId = section["idTransport"].toInt();
+            sectionDescription = getSectionDescription(section["start"].toString(), section["end"].toString(), nbStops, routeId);
         }
 
         QString type = section["type"].toString();
@@ -105,7 +106,7 @@ void Itineraire::setCriterias(QJsonObject criterias) {
     ui->connectionsValue->setText(connections);
 }
 
-QString Itineraire::getSectionDescription(QString start, QString end, int nbStop) {
+QString Itineraire::getSectionDescription(QString start, QString end, int nbStop, int routeId) {
     QString sectionDescription;
 
     QTime startTime = QTime::fromString(start, "hh:mm");
@@ -115,10 +116,10 @@ QString Itineraire::getSectionDescription(QString start, QString end, int nbStop
     if (nbStop == 0) {
         sectionDescription += "Walk for " + QString::number(minutes) + " minutes";
     } else {
-        QString lineName = "Ligne B";
-        QString lineDirection = "Berge de la Garonne";
-        sectionDescription += lineName + " direction " + lineDirection;
-        sectionDescription += "\n\t" + QString::number(nbStop) + " arrêt(s) - " + QString::number(minutes) + " minute(s)";
+        QStringList routeInfo = nodeAPI.getRouteInfo(routeId);
+
+        sectionDescription += routeInfo[1] + " direction " + routeInfo[2];
+        sectionDescription += "\n\t" + QString::number(nbStop) + " stop(s) - " + QString::number(minutes) + " minute(s)";
     }
 
     return sectionDescription;
@@ -131,7 +132,7 @@ void Itineraire::getPath(QJsonArray nodes) {
         qreal coordinates[2];
         nodeAPI.getNodeCoordinates(qint64(nodes[i].toDouble()), coordinates);
 
-        if (coordinates[0] < 0 && coordinates[1] > 180.0)
+        if (qAbs(coordinates[0]) > 90.0  && qAbs(coordinates[1]) > 180.0)
             continue;
 
         QJsonObject point
@@ -152,6 +153,8 @@ QHash<QString, QString> Itineraire::initTransportColor() {
     hash["tram"] = "indianred";
     hash["bus"] = "grey";
     hash["walking"] = "cadetblue";
+    hash["driving"] = "black";
+    hash["biking"] = "lightpink";
     return hash;
 }
 

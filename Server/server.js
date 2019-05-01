@@ -149,33 +149,6 @@ class QuadTree {
     }
 }
 
-/* GLOBAL VARIABLES */
-const express = require("express");
-const app = express();
-const fs = require("fs");
-const reader = fs.createReadStream(process.cwd() + '\\..\\Interface\\Data\\nodes.co');
-
-const maxLat = 44.903;
-const minLat = 44.776;
-const maxLon = -0.481;
-const minLon = -0.687;
-
-let deltaLat = maxLat - minLat;
-let deltaLon = maxLon - minLon;
-let midLat = (minLat + maxLat) / 2.0;
-let midLon = (minLon + maxLon) / 2.0;
-const halfDimension = ((deltaLat > deltaLon) ? deltaLat : deltaLon);
-const rootRegion = new Region(midLat, midLon, halfDimension);
-const quadTree = new QuadTree(rootRegion);
-
-const nodesData = new Map();
-var failed = 0;
-
-const invalidNode = {
-    latitude: -91.0,
-    longitude: 189.0
-}
-
 /* FUNCTIONS */
 function getName(nodeInfo) {
     let name = nodeInfo[5];
@@ -206,19 +179,9 @@ function distance(lat1, lon1, lat2, lon2) {
     return 6371 * c;
 }
 
-
-/* READING NODES.CO FILE : SETTING UP MAP AND QUAD OF NODES */
-console.time("Setting up data structures");
-console.log("Reading nodes.co");
-reader.on('data', function (line) {
-    if (nodesData.size > 1000000) {
-        return;
-    }
-
-    let data = line.toString().split('\n');
+function initMapAndQuad(data) {
     for (i = 0; i < data.length; i++) {
         let nodeInfo = data[i].split(' ');
-
         let info;
 
         let id = parseInt(nodeInfo[1]);
@@ -245,24 +208,14 @@ reader.on('data', function (line) {
             }
         }
 
-        nodesData.set(id, info);
         let node = new Node(id, lat, lon);
+
         quadTree.insert(node);
+        nodesData.set(id, info);        
     }
-});
+}
 
-reader.on('error', function() {console.log("error"); reader.close();})
-
-reader.on('end', function () {
-    console.timeEnd("Setting up data structures");
-
-    let lossRate = failed / nodesData.size * 100.0;
-    console.log(failed + " nodes lost out of " + nodesData.size + " => " + lossRate + "%");
-
-    var server = app.listen(8000, () => {
-        console.log("Waiting for requests ...");
-    })
-
+function setUpAPIRoutes() {
     app.get('/coord/:id', (req, res) => {
 
         console.time("getNodeInfo");
@@ -287,8 +240,117 @@ reader.on('end', function () {
         res.send(closestNodeId);
     });
 
+    app.get('/route/:id', (req, res) => {
+        console.time("getRouteInfo");
+        if (routesData.has(parseInt(req.params.id))) {
+            res.send(routesData.get(parseInt(req.params.id)));
+        } else {
+            res.send(invalidRoute);
+        }
+        console.timeEnd("getRouteInfo");
+    });
+
+    /*
     app.get('/stop', (req, res) => {
         res.send("Bye bitch !")
         server.close();
     })
+    */
+}
+
+function initAPI() {
+    var server = app.listen(8000, () => {
+        console.log("Waiting for requests ...");
+    })
+
+    setUpAPIRoutes();
+}
+
+function stats() {
+    let lossRate = failed / nodesData.size * 100.0;
+    console.log(failed + " nodes lost out of " + nodesData.size + " => " + lossRate + "%");
+}
+
+function initRoutesData(data) {
+    for (let i = 0; i < data.length - 1; i++) {
+        let routeData = data[i].match(/\w+|"[^"]+"/g);
+        let id = parseInt(routeData[0]);
+        let info = {
+            type: routeData[1].substring(1,routeData[1].length - 1),
+            name: routeData[2].substring(1,routeData[2].length - 1),
+            destination: routeData[3].substring(1,routeData[3].length - 1),
+        }
+        routesData.set(id, info);
+    }
+}
+
+
+/* GLOBAL VARIABLES */
+const express = require("express");
+const app = express();
+const fs = require("fs");
+
+const maxLat = 44.903;
+const minLat = 44.776;
+const maxLon = -0.481;
+const minLon = -0.687;
+
+let deltaLat = maxLat - minLat;
+let deltaLon = maxLon - minLon;
+let midLat = (minLat + maxLat) / 2.0;
+let midLon = (minLon + maxLon) / 2.0;
+const halfDimension = ((deltaLat > deltaLon) ? deltaLat : deltaLon);
+const rootRegion = new Region(midLat, midLon, halfDimension);
+const quadTree = new QuadTree(rootRegion);
+
+const nodesData = new Map();
+const routesData = new Map();
+var failed = 0;
+
+const invalidNode = {
+    latitude: 99.0,
+    longitude: 189.0
+}
+
+const invalidRoute = {
+    type: '',
+    name: '',
+    destination: ''
+}
+
+/* READING NODES.CO FILE : SETTING UP MAP AND QUAD OF NODES */
+console.time("Setting up data structures");
+
+const nodesFile = process.cwd() + '\\..\\Interface\\Data\\nodes.co';
+const routesFile = process.cwd() + '\\..\\Interface\\Data\\routes.txt';
+
+const filesToUpload = [nodesFile, routesFile];
+
+const uploadTasks = filesToUpload.map((file) => new Promise((resolve, reject) => {
+    var reader = fs.createReadStream(file);
+
+    reader.on('error', function(err) {reject(file); throw "Error with file " + file;})
+
+    reader.on('data', function(chunk) {
+        let data = chunk.toString().split('\n');
+
+        if (file === nodesFile) {
+            initMapAndQuad(data);
+        }
+
+        if (file === routesFile) {
+            initRoutesData(data);
+        }
+    });
+
+    reader.on('end', function() {resolve(file); console.log(file + " is processed");});
+}));
+
+Promise.all(uploadTasks)
+.then(() => {
+    console.log('All uploads completed.');
+    console.timeEnd("Setting up data structures");
+    stats();
+    initAPI();
 })
+.catch(() => {});
