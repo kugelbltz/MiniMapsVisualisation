@@ -23,10 +23,16 @@ public:
   double distance;
   double height_diff;
 
+  double time;
+  double price;
+
+  int k;
+
 public:
 
   Cost();
-  Cost(double, double);
+  // Cost(double, double, unsigned long long, double);
+  // Cost(double, double);
 
   friend bool operator<(const Cost&, const Cost&);
   friend bool operator==(const Cost&, const Cost&);

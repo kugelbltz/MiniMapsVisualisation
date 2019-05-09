@@ -15,6 +15,7 @@
 #include "AlgoSources/Arc.h"
 #include "AlgoSources/Graph.h"
 #include "AlgoSources/Position.h"
+#include "AlgoSources/Network.h"
 
 namespace Ui {
 class Interface;
@@ -46,6 +47,8 @@ private:
 
     Graph m_graph;
     std::map<long long, Position> m_nodes;
+    Network m_network;
+
 };
 
 #endif // INTERFACE_H

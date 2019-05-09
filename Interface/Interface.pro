@@ -19,7 +19,13 @@ HEADERS += \
     AlgoSources/Label.h \
     AlgoSources/Node.h \
     AlgoSources/Position.h \
-    AlgoSources/functions.h
+    AlgoSources/functions.h \
+    AlgoSources/Bag.h \
+    AlgoSources/Bags.h \
+    AlgoSources/Network.h \
+    AlgoSources/Route.h \
+    AlgoSources/RouteInfo.h \
+    AlgoSources/Stop.h
 
 SOURCES += \
     interface.cpp \
@@ -33,7 +39,13 @@ SOURCES += \
     AlgoSources/Label.cpp \
     AlgoSources/Node.cpp \
     AlgoSources/Position.cpp \
-    AlgoSources/functions.cpp
+    AlgoSources/functions.cpp \
+    AlgoSources/Bag.cpp \
+    AlgoSources/Bags.cpp \
+    AlgoSources/Network.cpp \
+    AlgoSources/Route.cpp \
+    AlgoSources/RouteInfo.cpp \
+    AlgoSources/Stop.cpp
 
 DISTFILES += \
     map.qml \

@@ -6,8 +6,6 @@
 
 #include "Node.h"
 #include "Arc.h"
-#include "Cost.h"
-#include <QMap>
 
 class Graph;
 
@@ -17,7 +15,7 @@ class Graph{
 
 public:
 
-  std::map<long long, std::map<long long, class Arc>> nodes;
+  std::map<long long, std::map<long long,class Arc> > nodes;
 
 public:
 

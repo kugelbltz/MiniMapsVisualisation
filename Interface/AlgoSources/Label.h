@@ -2,6 +2,8 @@
 #define LABEL_H
 
 #include <iostream>
+#include <list>
+#include "RouteInfo.h"
 #include "Cost.h"
 
 class Label;
@@ -21,14 +23,17 @@ public:
 
   long long node;
 
+  RouteInfo info;
+
   Label* prev_label;
 
 public:
 
   Label();
-  Label(long long);
-  //Label(double distance, double heigh_diff);
-
+//  Label(long long n, long long time, double price);
+  Label(long long n);
+  void fill(Label* c_it, long long r, long long t);
+  std::string to_path();
 
   friend bool operator<(const Label&, const Label&);
   friend bool operator==(const Label&, const Label&);

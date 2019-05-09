@@ -47,14 +47,23 @@ Itineraire::Itineraire(QJsonObject description, QWidget *parent)  :
             sectionDescription = getSectionDescription(section["start"].toString(), section["end"].toString(), nbStops, routeId);
         }
 
-        QString type = section["type"].toString();
-        m_colors.push_back(m_transportColor[type]);
+        //QString type = section["type"].toString();
+        int routeId = section["idTransport"].toInt();
+        QStringList routeInfo = nodeAPI.getRouteInfo(routeId);
+        if (routeInfo[0] == "") {
+            m_colors.push_back(m_transportColor["walking"]);
+            steps += "walking";
+        } else {
+            m_colors.push_back(m_transportColor[routeInfo[0]]);
+            steps += routeInfo[0];
+        }
+
+        steps += " - ";
 
         bool isPublic = section["public"].toBool();
         m_isSectionPublic.push_back(isPublic);
 
-        steps += type;
-        steps += " - ";
+
 
         ui->fullDescription->setCurrentFont(QFont("Raleway", 13, 63));
         ui->fullDescription->append(section["start"].toString() + " : " + name);

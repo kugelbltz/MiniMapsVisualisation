@@ -22,13 +22,15 @@
 #include <QProcess>
 
 #include "AlgoSources/functions.h"
+#include "AlgoSources/Network.h"
 
 
 using namespace std;
 
 Interface::Interface(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::Interface)
+    ui(new Ui::Interface),
+    m_network("Data/r.txt", "")
 {
     ui->setupUi(this);
 
@@ -44,7 +46,6 @@ Interface::Interface(QWidget *parent) :
 
 
     /* ALGO */
-
     QString graph_file("Data/graphWalk.cr");
     QString nodes_file("Data/nodes.co");
 
@@ -97,7 +98,7 @@ void Interface::getItineraryData() {
                             QString::number(start_node),
                             QString::number(end_node)};
 
-    QString result = QString::fromStdString(Namoa(m_graph, m_nodes, start_node, end_node));
+    QString result = QString::fromStdString(fusion(m_graph, m_nodes, m_network, start_node, end_node));
 
     QFile jSonFile("Data/output.json");
     if (jSonFile.open(QIODevice::ReadWrite|QIODevice::Truncate)) {

@@ -10,6 +10,12 @@ release/Label.o
 release/Node.o
 release/Position.o
 release/functions.o
+release/Bag.o
+release/Bags.o
+release/Network.o
+release/Route.o
+release/RouteInfo.o
+release/Stop.o
 release/qrc_ressources.o
 release/moc_interface.o
 release/moc_itineraire.o
