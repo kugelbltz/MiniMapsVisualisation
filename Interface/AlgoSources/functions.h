@@ -16,8 +16,6 @@
 #include "Position.h"
 #include "Label.h"
 #include "Cost.h"
-#include "Arc.h"
-#include "Node.h"
 #include "Graph.h"
 #include "Stop.h"
 #include "Route.h"
@@ -27,12 +25,19 @@
 #include "Network.h"
 #include "Json.h"
 
-std::string fusion(Graph& myGraph, std::map<long long, Position>& nodes,  Network& myNetwork, long long start_node, long long end_node);
+double time_str_to_n(std::string);
+
+void fill_footpaths(std::map<long long, std::map<long long, std::list<Label*>>>& footpaths, std::string footpaths_file_path);
+void calculate_footpaths(std::map<long long, Stop>& stops, Graph& myGraph,std::map<long long,Position> &nodes, std::string footpaths_file_path);
+
+std::string fusion(Graph& myGraph, std::map<long long, Position>& nodes,  Network& myNetwork, long long start_node, long long end_node, double start_time);
 void truncate(std::map<long long,Position> &nodes, std::list<Label*> &open_labels, long long end_node, double d);
 void getStops(std::vector<long long>& v, std::map<long long,Position> &nodes, std::map<long long, Stop>& stops, long long start_node, long long d);
-std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, long long start_node, long long end_node);
+std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, long long start_node, long long end_node, double start_time);
 std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, long long end_node, std::list<std::pair<Label*,Cost>> open_all);
 std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, long long end_node, std::list<Label*>& labels);
+
+void push_ordered(std::list<std::pair<Label*,Cost>> &open_all, Label* lb, Cost eval);
 
 double getDistance(std::map<long long,Position> &nodes, long long nd1, long long nd2);
 
@@ -41,6 +46,7 @@ double getHeightDiff(std::map<long long,Position> &nodes, long long nd1, long lo
 Cost getCost(std::map<long long,Position> &nodes, long long nd1, long long nd2);
 
 void filter(std::list<std::pair<Label*,Cost>>& open_all, std::map<long long, std::list<Label*>>& open, Label* lbp);
+void filter(std::list<std::pair<Label*,Cost>>& open_all, Cost c);
 
 bool dominated(Cost eval, const std::list<Label*>& label_list);
 
@@ -60,8 +66,8 @@ void remove( std::vector<long long>& vect, long long id);
 
 std::vector<long long> getNodes(Label* label);
 std::vector<std::vector<Label*>> getMNodes(Label * label);
-std::string to_json(std::list<Label*>& labels, Network &network);
+std::string to_json(std::list<Label*>& labels, Network &network, long long start_node, long long end_node, double start_time);
 
 void init_graph_complete(Graph& myGraph, std::map<long long,Position> & nodes, std::string graph_file_str, std::string nodes_file_str);
 
-void get_start_end(const std::string& in_file, long long& start_node, long long& end_node);
+void get_start_end(const std::string& in_file, long long& start_node, long long& end_node, double& start_time);

@@ -20,6 +20,7 @@
 #include <QNetworkReply>
 #include <QEventLoop>
 #include <QProcess>
+#include <map>
 
 #include "AlgoSources/functions.h"
 #include "AlgoSources/Network.h"
@@ -49,9 +50,9 @@ Interface::Interface(QWidget *parent) :
     QString graph_file("Data/graphWalk.cr");
     QString nodes_file("Data/nodes.co");
 
-    qDebug() << "Initializing graph";
+    qDebug() << "Initializing graph...";
     init_graph_complete(m_graph, m_nodes, graph_file.toStdString(), nodes_file.toStdString());
-    qDebug() << "Graph completed";
+    qDebug() << "Graph completed !";
 }
 
 Interface::~Interface()
@@ -84,21 +85,17 @@ void Interface::getItineraryData() {
 
     qint64 start_node = qint64(input["start"].toDouble());
     qint64 end_node = qint64(input["dest"].toDouble());
+    qreal start_time = qreal(input["startTime"].toDouble());
 
-//    if (start_node == 0 || end_node == 0) {
-//        ui->status->setText("Could not find node");
-//        //should send a signal
-//        return;
-//    }
+    QJsonObject criteriaObj = input["criteria"].toObject();
+    map<string,bool> criteria;
+    criteria["price"] = input["price"].toBool();
+    criteria["connections"] = input["connections"].toBool();
+    criteria["co2"] = input["co2"].toBool();
+    criteria["effort"] = input["effort"].toBool();
 
-    QStringList arguments = {"Data/graphWalk.cr",
-                            "Data/nodes.co",
-                            "Data/userInput.json",
-                            "Data/output.json",
-                            QString::number(start_node),
-                            QString::number(end_node)};
 
-    QString result = QString::fromStdString(fusion(m_graph, m_nodes, m_network, start_node, end_node));
+    QString result = QString::fromStdString(fusion(m_graph, m_nodes, m_network, start_node, end_node, start_time));
 
     QFile jSonFile("Data/output.json");
     if (jSonFile.open(QIODevice::ReadWrite|QIODevice::Truncate)) {
@@ -108,12 +105,6 @@ void Interface::getItineraryData() {
             stream << strJson << endl;
      }
     jSonFile.close();
-
-    /*
-    QProcess itineraryCalculator;
-    itineraryCalculator.start(QDir::currentPath() + "/../Algo/bin/Debug/Algo.exe", arguments);
-    itineraryCalculator.waitForFinished(-1);
-    */
 
 }
 
@@ -195,6 +186,14 @@ void Interface::displayItinerary(QJsonArray paths, QStringList colors, QList<boo
     QObject * object = ui->testMap->rootObject()->findChild<QObject*>("mapObject");
     QMetaObject::invokeMethod(object, "deleteRoute", Q_RETURN_ARG(QVariant, returnedValue));
 
+    QVariant markerALocation = paths.first().toArray().last();
+    QVariant markerBLocation = paths.last().toArray().first();
+
+    QMetaObject::invokeMethod(object, "showMarkers",
+                              Q_RETURN_ARG(QVariant, returnedValue),
+                              Q_ARG(QVariant, markerALocation),
+                              Q_ARG(QVariant, markerBLocation));
+
     for (int i(0); i < paths.size(); i++) {
         QVariant path = paths.at(i);
         QVariant color = colors.at(i);
@@ -234,7 +233,7 @@ QJsonObject Interface::generateAlgorithmInput() {
     mouseCord = ui->endEdit->text().split(", ");
     qint64 endNodeId = nodeAPI.getNearestNodeId(mouseCord[0].toDouble(), mouseCord[1].toDouble());
 
-    QString departureTime = ui->depTimeEdit->time().toString("HH:mm");
+    int departureTime = qRound(ui->depTimeEdit->time().msecsSinceStartOfDay() / 60000.0);
     QString privateTransportMode;
 
     if (ui->walking->isChecked())
@@ -246,7 +245,7 @@ QJsonObject Interface::generateAlgorithmInput() {
 
 
     QJsonObject data {
-        {"criterias", QJsonObject {
+        {"criteria", QJsonObject {
                 {"price", includePrice},
                 {"connections", includeConnections},
                 {"co2", includeCo2},
@@ -258,15 +257,6 @@ QJsonObject Interface::generateAlgorithmInput() {
         {"startTime", departureTime},
         {"mode", privateTransportMode}
     };
-
-    QFile jSonFile("Data/userInput.json");
-    if (jSonFile.open(QIODevice::ReadWrite|QIODevice::Truncate)) {
-            QTextStream stream(&jSonFile);
-            QJsonDocument doc(data);
-            QString strJson(doc.toJson(QJsonDocument::Indented));
-            stream << strJson << endl;
-     }
-    jSonFile.close();
 
     return data;
 }

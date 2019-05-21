@@ -7,5 +7,8 @@
         <file>Images/icon.png</file>
         <file>Images/marker48.png</file>
         <file>Stylesheets/interfaceStylesheet.txt</file>
+        <file>Images/markerA.png</file>
+        <file>Images/markerB.png</file>
+        <file>Images/splash.png</file>
     </qresource>
 </RCC>

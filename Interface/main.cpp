@@ -3,29 +3,8 @@
 #include "interface.h"
 #include <iostream>
 
-#include <stdio.h>
-#include <list>
-#include <iterator>
-#include <tuple>
-#include <vector>
-#include <map>
-#include <climits>
-#include <fstream>
-#include <cmath>
-#include <ctime>
-#include <sstream>
-#include <chrono>
-
-
-#include "AlgoSources/Position.h"
-#include "AlgoSources/Label.h"
-#include "AlgoSources/Cost.h"
-#include "AlgoSources/Arc.h"
-#include "AlgoSources/Node.h"
-#include "AlgoSources/Graph.h"
-#include "AlgoSources/functions.h"
-#include "AlgoSources/Json.h"
-
+#include <QSplashScreen>
+#include <QPixmap>
 
 int main(int argc, char * argv[]) {
 
@@ -38,8 +17,17 @@ int main(int argc, char * argv[]) {
     QString stylesheet = in.readAll();
     qApp->setStyleSheet(stylesheet);
 
+
+    QSplashScreen splash(QPixmap(":/Images/splash.png"));
+    splash.show();
+    splash.showMessage("Wait a minute... or five",Qt::AlignHCenter|Qt::AlignBottom, Qt::black);
     Interface fenetre;
+
+
+
+
     fenetre.showMaximized();
+    splash.finish(&fenetre);
 
     return app.exec();
 }

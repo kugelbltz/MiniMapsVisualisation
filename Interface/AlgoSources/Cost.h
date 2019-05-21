@@ -22,6 +22,8 @@ public:
 
   double distance;
   double height_diff;
+  double effort;
+  double co2;
 
   double time;
   double price;

@@ -9,6 +9,7 @@
 #include <QEvent>
 #include <QTextStream>
 #include <nodeapirequest.h>
+#include <QTime>
 
 namespace Ui {
 class Itineraire;
@@ -25,7 +26,7 @@ public:
     static QHash<QString, QString> initTransportColor();
     void mousePressEvent(QMouseEvent*);
     void hideMoreInfo();
-    QString getSectionDescription(QString start, QString end, int nbStop = 0, int routeId = 0);
+    QString getSectionDescription(int sectionStartTime, int sectionEndTime, int nbStop = 0, int routeId = 0);
     void setCriterias(QJsonObject criterias);
 
 private:
@@ -40,5 +41,9 @@ private:
 signals:
     void showMoreInfo(QJsonArray, QStringList, QList<bool>,Itineraire *);
 };
+
+QTime minToQTime(int min);
+int QTimeToInt(QTime time);
+
 
 #endif // ITINERAIRE_H

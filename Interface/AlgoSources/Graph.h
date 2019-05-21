@@ -4,7 +4,6 @@
 #include <iostream>
 #include <map>
 
-#include "Node.h"
 #include "Arc.h"
 
 class Graph;

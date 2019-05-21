@@ -169,7 +169,10 @@ compiler_rcc_clean:
 release/qrc_ressources.cpp: ressources.qrc \
 		C:/Qt/5.12.1/mingw73_64/bin/rcc.exe \
 		Images/icon.png \
+		Images/markerB.png \
+		Images/splash.png \
 		Images/marker48.png \
+		Images/markerA.png \
 		Stylesheets/interfaceStylesheet.txt \
 		section.qml \
 		map.qml
@@ -302,6 +305,8 @@ release/moc_interface.cpp: interface.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QEvent \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QTextStream \
 		nodeapirequest.h \
+		C:/Qt/5.12.1/mingw73_64/include/QtCore/QTime \
+		C:/Qt/5.12.1/mingw73_64/include/QtCore/qdatetime.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QVector \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QHash \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QJsonObject \
@@ -327,7 +332,6 @@ release/moc_interface.cpp: interface.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtNetwork/qsslerror.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtNetwork/qsslcertificate.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/qcryptographichash.h \
-		C:/Qt/5.12.1/mingw73_64/include/QtCore/qdatetime.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtNetwork/qssl.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QFlags \
 		C:/Qt/5.12.1/mingw73_64/include/QtNetwork/QSslPreSharedKeyAuthenticator \
@@ -336,7 +340,6 @@ release/moc_interface.cpp: interface.h \
 		AlgoSources/Arc.h \
 		AlgoSources/Cost.h \
 		AlgoSources/Graph.h \
-		AlgoSources/Node.h \
 		AlgoSources/Position.h \
 		AlgoSources/Network.h \
 		AlgoSources/Route.h \
@@ -458,6 +461,8 @@ release/moc_itineraire.cpp: itineraire.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QEvent \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QTextStream \
 		nodeapirequest.h \
+		C:/Qt/5.12.1/mingw73_64/include/QtCore/QTime \
+		C:/Qt/5.12.1/mingw73_64/include/QtCore/qdatetime.h \
 		release/moc_predefs.h \
 		C:/Qt/5.12.1/mingw73_64/bin/moc.exe
 	'C:\Qt\5.12.1\mingw73_64\bin\moc.exe' $(DEFINES) --include C:/Users/User/OneDrive/Documents/Enseirb/S8/ProjetAvance/MiniMaps/Interface/release/moc_predefs.h -IC:/Qt/5.12.1/mingw73_64/mkspecs/win32-g++ -IC:/Users/User/OneDrive/Documents/Enseirb/S8/ProjetAvance/MiniMaps/Interface -IC:/Qt/5.12.1/mingw73_64/include -IC:/Qt/5.12.1/mingw73_64/include/QtQuickWidgets -IC:/Qt/5.12.1/mingw73_64/include/QtWidgets -IC:/Qt/5.12.1/mingw73_64/include/QtLocation -IC:/Qt/5.12.1/mingw73_64/include/QtPositioningQuick -IC:/Qt/5.12.1/mingw73_64/include/QtQuick -IC:/Qt/5.12.1/mingw73_64/include/QtGui -IC:/Qt/5.12.1/mingw73_64/include/QtANGLE -IC:/Qt/5.12.1/mingw73_64/include/QtPositioning -IC:/Qt/5.12.1/mingw73_64/include/QtQml -IC:/Qt/5.12.1/mingw73_64/include/QtNetwork -IC:/Qt/5.12.1/mingw73_64/include/QtCore -IC:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++ -IC:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/x86_64-w64-mingw32 -IC:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/backward -IC:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include -IC:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include-fixed -IC:/Qt/Tools/mingw730_64/x86_64-w64-mingw32/include itineraire.h -o release/moc_itineraire.cpp
@@ -608,6 +613,8 @@ release/interface.o: interface.cpp interface.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QEvent \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QTextStream \
 		nodeapirequest.h \
+		C:/Qt/5.12.1/mingw73_64/include/QtCore/QTime \
+		C:/Qt/5.12.1/mingw73_64/include/QtCore/qdatetime.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QVector \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QHash \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QJsonObject \
@@ -633,7 +640,6 @@ release/interface.o: interface.cpp interface.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtNetwork/qsslerror.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtNetwork/qsslcertificate.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/qcryptographichash.h \
-		C:/Qt/5.12.1/mingw73_64/include/QtCore/qdatetime.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtNetwork/qssl.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QFlags \
 		C:/Qt/5.12.1/mingw73_64/include/QtNetwork/QSslPreSharedKeyAuthenticator \
@@ -642,7 +648,6 @@ release/interface.o: interface.cpp interface.h \
 		AlgoSources/Arc.h \
 		AlgoSources/Cost.h \
 		AlgoSources/Graph.h \
-		AlgoSources/Node.h \
 		AlgoSources/Position.h \
 		AlgoSources/Network.h \
 		AlgoSources/Route.h \
@@ -1250,6 +1255,7 @@ release/main.o: main.cpp C:/Qt/5.12.1/mingw73_64/include/QtWidgets/QApplication 
 		C:/Qt/5.12.1/mingw73_64/include/QtGui/QMouseEvent \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QTextStream \
 		nodeapirequest.h \
+		C:/Qt/5.12.1/mingw73_64/include/QtCore/QTime \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QVector \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QHash \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QJsonObject \
@@ -1278,17 +1284,12 @@ release/main.o: main.cpp C:/Qt/5.12.1/mingw73_64/include/QtWidgets/QApplication 
 		AlgoSources/Arc.h \
 		AlgoSources/Cost.h \
 		AlgoSources/Graph.h \
-		AlgoSources/Node.h \
 		AlgoSources/Position.h \
 		AlgoSources/Network.h \
 		AlgoSources/Route.h \
 		AlgoSources/Stop.h \
-		AlgoSources/Label.h \
-		AlgoSources/RouteInfo.h \
-		AlgoSources/functions.h \
-		AlgoSources/Bag.h \
-		AlgoSources/Bags.h \
-		AlgoSources/Json.h
+		C:/Qt/5.12.1/mingw73_64/include/QtWidgets/QSplashScreen \
+		C:/Qt/5.12.1/mingw73_64/include/QtGui/QPixmap
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/main.o main.cpp
 
 release/itineraire.o: itineraire.cpp itineraire.h \
@@ -1404,6 +1405,8 @@ release/itineraire.o: itineraire.cpp itineraire.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QEvent \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QTextStream \
 		nodeapirequest.h \
+		C:/Qt/5.12.1/mingw73_64/include/QtCore/QTime \
+		C:/Qt/5.12.1/mingw73_64/include/QtCore/qdatetime.h \
 		ui_itineraire.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtWidgets/QApplication \
 		C:/Qt/5.12.1/mingw73_64/include/QtWidgets/qapplication.h \
@@ -1438,8 +1441,6 @@ release/itineraire.o: itineraire.cpp itineraire.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QDir \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/qdir.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/qfileinfo.h \
-		C:/Qt/5.12.1/mingw73_64/include/QtCore/QTime \
-		C:/Qt/5.12.1/mingw73_64/include/QtCore/qdatetime.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QJsonObject \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/qjsonobject.h \
 		C:/Qt/5.12.1/mingw73_64/include/QtCore/QtMath \
@@ -1561,8 +1562,6 @@ release/Cost.o: AlgoSources/Cost.cpp AlgoSources/Cost.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/Cost.o AlgoSources/Cost.cpp
 
 release/Graph.o: AlgoSources/Graph.cpp AlgoSources/Graph.h \
-		AlgoSources/Node.h \
-		AlgoSources/Position.h \
 		AlgoSources/Arc.h \
 		AlgoSources/Cost.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/Graph.o AlgoSources/Graph.cpp
@@ -1589,9 +1588,8 @@ release/functions.o: AlgoSources/functions.cpp AlgoSources/functions.h \
 		AlgoSources/Label.h \
 		AlgoSources/RouteInfo.h \
 		AlgoSources/Cost.h \
-		AlgoSources/Arc.h \
-		AlgoSources/Node.h \
 		AlgoSources/Graph.h \
+		AlgoSources/Arc.h \
 		AlgoSources/Stop.h \
 		AlgoSources/Route.h \
 		AlgoSources/Bag.h \

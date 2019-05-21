@@ -53,7 +53,7 @@ Item {
         MapRectangle {
                 color: 'transparent'
                 border.width: 2
-                border.color: 'red'
+                border.color: 'gray'
                 bottomRight {
                     latitude: 44.776
                     longitude: -0.481
@@ -62,6 +62,50 @@ Item {
                     latitude: 44.903
                     longitude: -0.687
                 }
+        }
+
+        MapQuickItem {
+            id: markerA
+            objectName: "markerA"
+            visible: true
+            coordinate: QtPositioning.coordinate(50.83, -0.58)
+            anchorPoint.x: markerAImg.width/2
+            anchorPoint.y: markerAImg.height - 5
+            sourceItem: Image {
+                id: markerAImg
+                source: "qrc:/Images/markerA.png"
+            }
+        }
+
+        MapQuickItem {
+            id: markerB
+            objectName: "markerB"
+            visible: true
+            coordinate: QtPositioning.coordinate(50.8, -0.58)
+            anchorPoint.x: markerBImg.width/2
+            anchorPoint.y: markerBImg.height - 5
+            sourceItem: Image {
+                id: markerBImg
+                source: "qrc:/Images/markerB.png"
+            }
+        }
+
+        function showMarkers(markerALocation, markerBLocation) {
+            var latA = markerALocation["latitude"];
+            var latB = markerBLocation["latitude"];
+            var lonA = markerALocation["longitude"];
+            var lonB = markerBLocation["longitude"];
+
+            markerA.coordinate = QtPositioning.coordinate(latA,lonA);
+            markerB.coordinate = QtPositioning.coordinate(latB,lonB);
+
+            markerA.visible = true;
+            markerB.visible = true;
+        }
+
+        function hideMarkers() {
+            markerA.visible = false;
+            markerB.visible = false;
         }
 
         function loadSection(c, p, isPublic) {
@@ -77,15 +121,16 @@ Item {
 
                 map.center = QtPositioning.coordinate(midLat,midLon);
                 // Zoomer
-                /*
+
                 var point1 = QtPositioning.coordinate(p[0]["latitude"], p[0]["longitude"]);
                 var point2 = QtPositioning.coordinate(p[p.length-1]["latitude"], p[p.length-1]["longitude"]);
-                var dist = point1.distanceTo(point2) + 100;
+                var dist = point1.distanceTo(point2) / 1000.0;
 
-                var myZoom = (dist + 7000) / 600;
+                var myZoom = -0.289958 * dist + 16.2;
 
-                map.zoomLevel = myZoom;
-                */
+
+                //map.zoomLevel = myZoom;
+
                 if (isPublic) {
                     var stops = section.createStops();
                     for (var i = 0; i < stops.length; i++) {
@@ -99,9 +144,10 @@ Item {
 
 
         function deleteRoute() {
+            hideMarkers();
             var len = map.mapItems.length
-            for (var i = 3; i < len; i++) {
-                map.removeMapItem(map.mapItems[3]);
+            for (var i = 5; i < len; i++) {
+                map.removeMapItem(map.mapItems[5]);
             }
         }
 
@@ -121,5 +167,3 @@ Item {
         }
     }
 }
-//Ajouter un bouton pour revenir a la vue d'origine
-// et des boutons pour zoomer et tout

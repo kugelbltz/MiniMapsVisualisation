@@ -77,6 +77,10 @@ long long Network::et(long long r, long long pi, double t_pi) const{
 
 void Network::get_trips(long long r, long long pi, double t_pi, std::vector<long long> &trips) const{
   long long t;
+  
+  while(t_pi >= 1440)
+    t_pi-= 1440;
+
   t = this->et(r, pi, t_pi);
 
   const Route& route = routes.at(r);

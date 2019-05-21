@@ -13,7 +13,7 @@ Label::Label():prev_label(nullptr){}
 //   g = *g_ptr;
 // }
 //
-Label::Label(long long n):prev_label(nullptr),node(n){}
+Label::Label(long long n):node(n), prev_label(nullptr){}
 
 void Label::fill(Label* c_it, long long r, long long t){
 
@@ -52,7 +52,6 @@ void Label::fill(Label* c_it, long long r, long long t){
      os << "cost " << lb.g << ", trip: " << lb.info.trip << ", prev_stop: " << (lb.prev_label == NULL ? -1 : lb.prev_label->node) << ", route: " << lb.info.route;
      return os;
  }
-
 
  string Label::to_path(){
    Label* l = this;

@@ -17,38 +17,47 @@ Itineraire::Itineraire(QJsonObject description, QWidget *parent)  :
     ui(new Ui::Itineraire)
 {
     ui->setupUi(this);
-
     setMouseTracking(true);
-
     ui->fullDescription->setAcceptRichText(true);
 
     QJsonObject criterias = description["criteria"].toObject();
     QJsonArray sections = description["sections"].toArray();
 
+
     QString steps;
 
-    QString startTime = sections[0].toObject()["start"].toString();
-    QString endTime = sections[sections.size()-1].toObject()["end"].toString();
-    QString duration = QString::number(criterias["time"].toInt());
-    QString endName = nodeAPI.getNodeName(sections[sections.size()-1].toObject()["nodes"].toArray()[0].toInt());
+    int itStartTime = sections.last().toObject()["start"].toInt();
+    int itEndTime = sections.first().toObject()["end"].toInt();
 
-    for (int i(0); i < sections.size();i++) {
+    int itDuration = criterias["time"].toInt();
+
+    QString endName = nodeAPI.getNodeName(qint64(sections.first().toObject()["nodes"].toArray().first().toDouble()));
+
+    for (int i(sections.size()-1); i >= 0; i--) {
         QJsonObject section = sections[i].toObject();
-        QString name = nodeAPI.getNodeName(qint64(section["nodes"].toArray()[0].toInt()));
+        QJsonArray nodes = section["nodes"].toArray();
+        int routeId = section["idTransport"].toInt();
+        int sectionStartTime = section["start"].toInt();
+        int sectionEndTime = section["end"].toInt();
 
-        getPath(section["nodes"].toArray());
+        QString firstNodeName = nodeAPI.getNodeName(qint64(nodes.last().toDouble()));
+
+        getPath(nodes);
 
         QString sectionDescription;
         if (!section["public"].toBool()) {
-            sectionDescription = getSectionDescription(section["start"].toString(), section["end"].toString());
+            sectionDescription = getSectionDescription(sectionStartTime, sectionEndTime);
         } else {
-            int nbStops = section["nodes"].toArray().size();
-            int routeId = section["idTransport"].toInt();
-            sectionDescription = getSectionDescription(section["start"].toString(), section["end"].toString(), nbStops, routeId);
+            int nbStops = nodes.size(); //peut etre -1
+            sectionDescription = getSectionDescription(sectionStartTime, sectionEndTime, nbStops, routeId);
         }
 
-        //QString type = section["type"].toString();
-        int routeId = section["idTransport"].toInt();
+        ui->fullDescription->setCurrentFont(QFont("Raleway", 13, 63));
+        QString sectionStartTimeStr = minToQTime(sectionStartTime).toString("hh:mm");
+        ui->fullDescription->append(sectionStartTimeStr + " : " + firstNodeName);
+        ui->fullDescription->setCurrentFont(QFont("Raleway", 9));
+        ui->fullDescription->append("\t " + sectionDescription);
+
         QStringList routeInfo = nodeAPI.getRouteInfo(routeId);
         if (routeInfo[0] == "") {
             m_colors.push_back(m_transportColor["walking"]);
@@ -63,24 +72,18 @@ Itineraire::Itineraire(QJsonObject description, QWidget *parent)  :
         bool isPublic = section["public"].toBool();
         m_isSectionPublic.push_back(isPublic);
 
-
-
-        ui->fullDescription->setCurrentFont(QFont("Raleway", 13, 63));
-        ui->fullDescription->append(section["start"].toString() + " : " + name);
-        ui->fullDescription->setCurrentFont(QFont("Raleway", 9));
-        ui->fullDescription->append("\t " + sectionDescription);
     }
 
     steps.replace(steps.length()-2, 2, "");
 
-    ui->duration->setText(duration + " min");
-    ui->timeSlot->setText(startTime + " - " + endTime);
+    ui->duration->setText(QString::number(itDuration) + " min");
+    ui->timeSlot->setText(minToQTime(itStartTime).toString("hh:mm") + " - " + minToQTime(itEndTime).toString("hh:mm"));
     ui->steps->setText(steps);
 
     setCriterias(criterias);
 
     ui->fullDescription->setCurrentFont(QFont("Raleway", 13, 63));
-    ui->fullDescription->append(endTime + " : " + endName);
+    ui->fullDescription->append(minToQTime(itEndTime).toString("hh:mm") + " : " + endName);
     ui->fullDescription->setReadOnly(true);
     hideMoreInfo();
 
@@ -115,20 +118,18 @@ void Itineraire::setCriterias(QJsonObject criterias) {
     ui->connectionsValue->setText(connections);
 }
 
-QString Itineraire::getSectionDescription(QString start, QString end, int nbStop, int routeId) {
+QString Itineraire::getSectionDescription(int sectionStartTime, int sectionEndTime, int nbStop, int routeId) {
     QString sectionDescription;
 
-    QTime startTime = QTime::fromString(start, "hh:mm");
-    QTime endTime = QTime::fromString(end, "hh:mm");
-    int minutes = qCeil(startTime.secsTo(endTime)/60.0);
+    int sectionDuration = sectionEndTime - sectionStartTime;
 
     if (nbStop == 0) {
-        sectionDescription += "Walk for " + QString::number(minutes) + " minutes";
+        sectionDescription += "Walk for " + QString::number(sectionDuration) + " minutes";
     } else {
         QStringList routeInfo = nodeAPI.getRouteInfo(routeId);
 
         sectionDescription += routeInfo[1] + " direction " + routeInfo[2];
-        sectionDescription += "\n\t" + QString::number(nbStop) + " stop(s) - " + QString::number(minutes) + " minute(s)";
+        sectionDescription += "\n\t" + QString::number(nbStop) + " stop(s) - " + QString::number(sectionDuration) + " minute(s)";
     }
 
     return sectionDescription;
@@ -193,4 +194,14 @@ void Itineraire::hideMoreInfo() {
     ui->line->hide();
     ui->line2->hide();
     ui->criterias->hide();
+}
+
+QTime minToQTime(int min) {
+    int h = min / 60;
+    int m = min % 60;
+    return QTime(h,m);
+}
+
+int QTimeToInt(QTime time) {
+    return time.hour() * 60 + time.minute();
 }

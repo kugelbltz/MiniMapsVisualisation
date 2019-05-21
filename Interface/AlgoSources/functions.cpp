@@ -18,7 +18,6 @@
 #include "Label.h"
 #include "Cost.h"
 #include "Arc.h"
-#include "Node.h"
 #include "Graph.h"
 #include "Bag.h"
 #include "Bags.h"
@@ -31,28 +30,133 @@
 
 using namespace std;
 
-string fusion(Graph& myGraph, std::map<long long, Position>& nodes, Network& myNetwork, long long start_node, long long end_node){
+void fill_footpaths(map<long long, map<long long, list<Label*>>>& footpaths, string footpaths_file_path){
+
+  ifstream stream;
+  stream.open(footpaths_file_path);
+  long long n1, n2;
+  double distance, height_diff, time, price;
+  long long size;
+  long long nb;
+  int k;
+  Label* l;
+  Label* l_tmp;
+  long long n;
+
+  stream >> nb;
+  cout << "nb " << nb << endl;
+  for(long long j=0; j<nb; ++j){
+
+    l = new Label();
+    cout << j << ") ";
+    stream >> n1 >> n2 >> distance >> height_diff >> time >> price >> k >> size;
+
+    cout << n1 << " " << n2 << endl;
+
+    l->node = n2;
+    l->g.distance = distance;
+    l->g.height_diff = height_diff;
+    l->g.time = time;
+    l->g.price = price;
+    l->g.k = k;
+
+
+    l_tmp = l;
+    stream >> n;
+    for(long long i=0; i<size-1; ++i){
+
+      stream >> n;
+      l_tmp->prev_label = new Label(n);
+      l_tmp = l_tmp->prev_label;
+    }
+
+    cout << *l << endl;
+    footpaths[n1][n2].push_back(l);
+    cout << *(footpaths[n1][n2].back()) << endl;
+  }
+
+}
+
+void calculate_footpaths(map<long long, Stop>& stops, Graph& myGraph,map<long long,Position> &nodes, string footpaths_file_path){
+
+  ofstream footpaths_file;
+  footpaths_file.open(footpaths_file_path);
+
+  stringstream str;
+  long long d = 1000;
+
+  map<long long, Stop>::iterator it;
+  map<long long, Stop>::iterator it2;
+
+  list<Label*> labels;
+  list<Label*>::iterator l_it;
+  vector<long long> v;
+  int i(0);
+  for (it = stops.begin(); it != stops.end(); ++it) {
+    cout << i << " ";
+    ++i;
+    cout << "============================ node " << it->first << endl;
+    for (it2 = stops.begin(); it2 != stops.end(); ++it2) {
+      if(it->first == it2->first || getDistance(nodes, it->first, it2->first) > d)
+        continue;
+
+      cout << "node " << it2->first << endl;
+      labels = Namoa(myGraph, nodes, it->first, it2->first, 0);
+
+      for(l_it=labels.begin(); l_it!=labels.end(); ++l_it){
+
+        v = getNodes(*l_it);
+        str << it->first << " " << it2->first << " " << (*l_it)->g.distance << " " << (*l_it)->g.height_diff << " " << (*l_it)->g.time << " " << (*l_it)->g.price << " " << (*l_it)->g.k << " " << v.size() << endl;
+
+        for(unsigned int i=0; i<v.size(); ++i)
+          str << v[i] << " ";
+        str << endl;
+      }
+
+    }
+  }
+
+  cout << "================================" << endl;
+  cout << str.str() << endl;
+  footpaths_file << i << endl;
+  footpaths_file << str.str();
+
+}
+
+double time_str_to_n(string s){
+  double h,m;
+  string h_s, m_s;
+
+  h_s = s.substr(0, s.find(":"));
+  m_s = s.substr(s.find(":")+1);
+
+  h = atof(h_s.c_str());
+  m = atof(m_s.c_str());
+  return h*60 + m;
+}
+
+string fusion(Graph& myGraph, std::map<long long, Position>& nodes, Network& myNetwork, long long start_node, long long end_node, double start_time){
 
   map<long long, Route> &routes = myNetwork.routes;
   map<long long, Stop> &stops = myNetwork.stops;
 
-  long long nb_routes = myNetwork.nb_routes();
-  long long total_nb_stops = myNetwork.nb_stops();
+  // long long nb_routes = myNetwork.nb_routes();
+  // long long total_nb_stops = myNetwork.nb_stops();
 
   Bag best_labels;
 
   map<int, Bag> best_labels_k;
 
-   list<Label*> list_tmp = Namoa(myGraph, nodes, start_node, end_node);
+   list<Label*> list_tmp = Namoa(myGraph, nodes, start_node, end_node, start_time);
 
    best_labels = Bag(list_tmp);
    best_labels_k[0] = best_labels;
 
-  long long distance = 200;
+  long long distance = 1000;
   vector<long long> source_stops;
   getStops(source_stops, nodes, stops, start_node, distance);
 
-  cout << "found " << source_stops.size() << " stops nearby"<< endl;
+//  cout << "found " << source_stops.size() << " stops nearby"<< endl;
 
 
    // cout << "============ source_stops ============" << endl;
@@ -98,15 +202,17 @@ string fusion(Graph& myGraph, std::map<long long, Position>& nodes, Network& myN
    map<long long, Stop>::iterator s_it;
    map<long long, Route>::iterator r_it;
 
+   int t_tmp;
+
    list<Label*> open_labels;
    Bag bag_tmp;
    /* INITIALIZING VARIABLES */
 
    for(unsigned int i=0; i < source_stops.size(); ++i){
-     B(source_stops[i], 0).bag = Namoa(myGraph, nodes, start_node, source_stops[i]);
+     B(source_stops[i], 0).bag = Namoa(myGraph, nodes, start_node, source_stops[i], start_time);
      bags_star[source_stops[i]] = B(source_stops[i], 0);
      marked[source_stops[i]] = true;
-     cout << source_stops[i] << " marked" << endl;
+//     cout << source_stops[i] << " marked" << endl;
    }
 
    // Label l;
@@ -124,16 +230,16 @@ string fusion(Graph& myGraph, std::map<long long, Position>& nodes, Network& myN
        //increment round number
        k++;
 
-       cout << endl << "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
-       cout << "              ROUND " << k << endl;
-       cout << "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------" << endl << endl;
-
+       // cout << endl << "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+       // cout << "              ROUND " << k << endl;
+       // cout << "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------" << endl << endl;
+       //
        marked_any = false;
 
        //Clear Q
      //  Q.assign(nb_routes,-1);
        Q.clear();
-       cout << "Clearing Q" << endl;
+//       cout << "Clearing Q" << endl;
 
        //Loop through marked stops only
          for(s_it=stops.begin(); s_it!=stops.end(); ++s_it){
@@ -158,14 +264,14 @@ string fusion(Graph& myGraph, std::map<long long, Position>& nodes, Network& myN
        }  //fill Q
 
        //DISPLAY routes
-       cout << "Routes (r,p) in Q are : " << endl;
+  //     cout << "Routes (r,p) in Q are : " << endl;
 
        for(r_it=routes.begin(); r_it!=routes.end(); ++r_it){
          i = r_it->first;
          if(Q.find(i)!= Q.end())
-           cout << "(" << i << "," << Q[i] << ")" << endl;
+          ;// cout << "(" << i << "," << Q[i] << ")" << endl;
        }
-       cout << endl;
+      // cout << endl;
 
 
        //Processing each route in Q
@@ -175,7 +281,7 @@ string fusion(Graph& myGraph, std::map<long long, Position>& nodes, Network& myN
           if(Q.find(r) == Q.end())
              continue;
 
-           cout << "----------------------------------------------------------------------------------------------------processing route " << r << " starting with stop " << Q[r] << endl;
+      //     cout << "----------------------------------------------------------------------------------------------------processing route " << r << " starting with stop " << Q[r] << endl;
 
            p = Q[r];
            p_pos = myNetwork.route_pos(r,p);
@@ -186,76 +292,79 @@ string fusion(Graph& myGraph, std::map<long long, Position>& nodes, Network& myN
            for(long long j=p_pos; j<routes[r].nb_stops; ++j){
 
                pi = routes[r].stops[j];
-               cout << "---------------------------------------------------------------------------Stop " << pi << endl;
+      //         cout << "---------------------------------------------------------------------------Stop " << pi << endl;
                pi_pos = j;
 
-               cout << "Br is:" << endl << Br << endl;
-               cout << "B* is:" << endl << bags_star[pi] << endl;
-
-               cout << "-------------------------traversing Br labels" << endl;
+               // cout << "Br is:" << endl << Br << endl;
+               // cout << "B* is:" << endl << bags_star[pi] << endl;
+               //
+               // cout << "-------------------------traversing Br labels" << endl;
                for(it=Br.begin(); it!=Br.end(); ++it){
 
                  //--------------------------------------------------------
                  Label& l_ref = **it;
-
+                 t_tmp = l_ref.g.time;
                  l_ref.g.time = routes[r].trips[l_ref.info.trip][pi_pos];
+                 while(l_ref.g.time < t_tmp)
+                    l_ref.g.time+= 1440;
                  l_ref.g.price = l_ref.prev_label->g.price + myNetwork.getCost(r, l_ref.info.trip, l_ref.prev_label->node, pi);
                  l_ref.node = pi;
-                 cout << l_ref << endl;
+//                 cout << l_ref << endl;
 
                  if( l_ref <= Bag(best_labels) && bags_star[pi].push_nondom(&l_ref) ){
 
                      B(pi,k).push_nondom(&l_ref);
                      marked[pi] = true;
                      marked_any = true;
-                     cout << "adding Label to bag and marking " << pi << endl;
+          //           cout << "adding Label to bag and marking " << pi << endl;
 
                  }else{
-                     cout << "Label not added" << endl;
+                   ;
+  //                   cout << "Label not added" << endl;
                  }
                } //Br Label loop
 
-               cout << "-------------------------end of Br" << endl;
-               cout << "B* of stop " << pi << " now is:" << endl;
-               cout << bags_star[pi] << endl;
-
-               cout << "-------------------------traversing B*" << endl;
+               // cout << "-------------------------end of Br" << endl;
+               // cout << "B* of stop " << pi << " now is:" << endl;
+               // cout << bags_star[pi] << endl;
+               //
+               // cout << "-------------------------traversing B*" << endl;
 
                for(c_it=bags_star[pi].cbegin(); c_it!=bags_star[pi].cend(); ++c_it){
-                 cout << **c_it << endl;
+          //       cout << **c_it << endl;
 
                  trips.clear();
                  myNetwork.get_trips(r, pi, (*c_it)->g.time, trips);
 
-                 cout << "trips is of size " << trips.size() << endl;
+            //     cout << "trips is of size " << trips.size() << endl;
 
                  for(unsigned long long i=0; i<trips.size(); ++i){
 
-                   cout << "trip " << trips[i] << ":" << endl;
+            //       cout << "trip " << trips[i] << ":" << endl;
 
                    if(trips[i] < 0){
-                     cout << "Label not added to Br" << endl;
+            //         cout << "Label not added to Br" << endl;
                      break;
                    }
 
                    l_tmp.fill(*c_it, r, trips[i]);
-                   cout << "calculated label is:" << endl;
-                   cout << l_tmp << endl;
+                   // cout << "calculated label is:" << endl;
+                   // cout << l_tmp << endl;
                    Label* label_k;
 
                    if(Br.push_nondom(&l_tmp, label_k)){
                      ++label_k->g.k;
-                     cout << "Label added to Br" << endl;
+            //         cout << "Label added to Br" << endl;
                    }
                    else
-                     cout << "Label not added to Br" << endl;
+              ;//       cout << "Label not added to Br" << endl;
                  } // trips
 
                } //add B*(pi) to Br
-
-               cout << "-------------------------end of B*" << endl;
-               cout << "Br now is:" << endl;
-               cout << Br << endl;
+               //
+               // cout << "-------------------------end of B*" << endl;
+               // cout << "Br now is:" << endl;
+               // cout << Br << endl;
 
 
 
@@ -284,45 +393,49 @@ string fusion(Graph& myGraph, std::map<long long, Position>& nodes, Network& myN
 
            truncate(nodes, open_labels, end_node, 1000);
 
-           cout << "----------------------------------------------------------------------------------------------------Calculating path to dest from " << open_labels.size() << " stops"<< endl;
+    //       cout << "----------------------------------------------------------------------------------------------------Calculating path to dest from " << open_labels.size() << " stops"<< endl;
 
 
            list_tmp = Namoa(myGraph, nodes, end_node, open_labels);
 
 
            bag_tmp = Bag(list_tmp);
-
-           cout << "-------------------------paths found:" << endl;
-           cout << bag_tmp;
-           cout << "-------------------------adding paths" << endl;
-           cout << "best labels before" << endl;
-           cout << best_labels;
+           //
+           // cout << "-------------------------paths found:" << endl;
+           // cout << bag_tmp;
+           // cout << "-------------------------adding paths" << endl;
+           // cout << "best labels before" << endl;
+           // cout << best_labels;
 
            for(it = bag_tmp.begin(); it != bag_tmp.end(); ++it){
-             cout << **it << endl;
+    //         cout << **it << endl;
              if(best_labels.push_nondom(*it))
-               cout << "Label added" << endl;
+             ;
+              // cout << "Label added" << endl;
            }
-
-           cout << "best labels after" << endl;
-           cout << best_labels;
+           //
+           // cout << "best labels after" << endl;
+           // cout << best_labels;
 
    } //rounds
 
-   cout << endl << "------------------------------------" << endl;
-   cout << "         End of algorithm"<< endl;
-   cout << "------------------------------------" << endl << endl;
+   // cout << endl << "------------------------------------" << endl;
+   // cout << "         End of algorithm"<< endl;
+   // cout << "------------------------------------" << endl << endl;
+   //
+   //
+    cout << best_labels << endl;
 
-
-   cout << best_labels << endl;
-
-   for(it = best_labels.begin(); it!=best_labels.end(); ++it){
-     cout << (*it)->to_path() << endl;
-   }
+   // for(it = best_labels.begin(); it!=best_labels.end(); ++it){
+   //   cout << (*it)->to_path() << endl;
+   // }
 
 
      string result;
-     result = to_json(best_labels.bag, myNetwork);
+     result = to_json(best_labels.bag, myNetwork, start_node, end_node, start_time);
+
+     for(Bag::iterator itt = best_labels.begin(); itt!=best_labels.end(); ++itt)
+        cout << (*itt)->to_path() << endl;
 
      return result;
  }
@@ -370,7 +483,7 @@ Cost getCost(std::map<long long,Position> &nodes, long long nd1, long long nd2){
   Cost g;
   g.distance = getDistance(nodes, nd1, nd2);
 //  g.height_diff = getHeightDiff(nodes, nd1, nd2);
-  g.time = g.distance/60;
+  //g.time = g.distance/60;
 
   return g;
 }
@@ -385,6 +498,20 @@ void filter(std::list<std::pair<Label*,Cost>>& open_all, std::map<long long, std
         if(lbp->g < it->second){
             it = open_all.erase(it);
             open[lbp_tmp->node].remove(lbp_tmp);
+            continue;
+        }
+
+        ++it;
+    }
+}
+
+void filter(std::list<std::pair<Label*,Cost>>& open_all, Cost c){
+
+    std::list<std::pair<Label*,Cost>>::iterator it;
+    it = open_all.begin();
+    while(it != open_all.end()){
+        if(c < it->second){
+            it = open_all.erase(it);
             continue;
         }
 
@@ -475,10 +602,37 @@ bool isNondom(std::list<Label*>& open, Label* label){
 
 std::list<std::pair<Label*,Cost>>::iterator getNondomNode(std::list<std::pair<Label*,Cost>>& open_all){
 
-  for(std::list<std::pair<Label*,Cost>>::iterator it = open_all.begin(); it!=open_all.end(); ++it){
-    if(isNondom(open_all,it))
-      return it;
+  std::list<std::pair<Label*,Cost>> open_copy;
+  std::list<std::pair<Label*,Cost>>::iterator it;
+
+
+  for(it = open_all.begin(); it != open_all.end(); ++it){
+    if(it->second.distance != open_all.begin()->second.distance)
+      break;
+    open_copy.push_back(*it);
   }
+
+  if(open_copy.size() == 1)
+    return open_all.begin();
+
+
+  for(it = open_copy.begin(); it!=open_copy.end();){
+    if(isNondom(open_copy,it))
+      break;
+    filter(open_copy, it->second);
+    it = open_copy.erase(it);
+  }
+
+  if(it==open_copy.end()){
+    return open_all.begin();
+  }
+
+  for(std::list<std::pair<Label*,Cost>>::iterator ito = open_all.begin(); ito!=open_all.end(); ++ito){
+    if(*it == *ito){
+      return ito;
+    }
+  }
+
   return open_all.begin();
 }
 
@@ -568,7 +722,7 @@ vector<vector<Label* >> getMNodes(Label * label){
 
 }
 
-std::string to_json(std::list<Label*>& labels, Network& net){
+std::string to_json(std::list<Label*>& labels, Network& net, long long start_node, long long end_node, double start_time){
 
   if(labels.size() == 0){
     return "{}";
@@ -585,21 +739,24 @@ std::string to_json(std::list<Label*>& labels, Network& net){
   vector<vector<Label*>> nodes_matrix;
 
   obj.add("nb_itineraries", new Integer(labels.size()));
+  obj.add("start", new Integer(start_node));
+  obj.add("dest", new Integer(end_node));
   std::list<Label*>::iterator it;
   Label* label;
 
   for(it = labels.begin(); it != labels.end(); ++it){
+
     itinerary = new Object();
     label = *it;
     criteria = new Object();
 
     criteria->add("distance", new Integer(label->g.distance));
-    criteria->add("time", new Integer(label->g.time));
-    criteria->add("price", new Real(0));
+    criteria->add("time", new Integer(label->g.time - start_time));
+    criteria->add("price", new Real(label->g.price));
     criteria->add("height", new Integer(label->g.height_diff));
     criteria->add("connections", new Integer(label->g.k));
-    criteria->add("co2" , new Integer(0));
-    criteria->add("effort", new Integer(0));
+    criteria->add("co2" , new Integer(label->g.co2));
+    criteria->add("effort", new Integer(label->g.effort));
 
     itinerary->add("criteria", criteria);
 
@@ -616,31 +773,35 @@ std::string to_json(std::list<Label*>& labels, Network& net){
         section = new Object();
         nodes = new Array();
         nodes_vect = nodes_matrix[j];
-
+        int start_t;
+        int end_t;
         if(nodes_vect[0]->info.route < 0){
           for(unsigned int i=0; i < nodes_vect.size(); ++i){
             nodes->arr.push_back(new Integer(nodes_vect[i]->node));
           }
+          start_t = nodes_vect.back()->g.time;
+          end_t = nodes_vect.front()->g.time;
         }else{
           Route& route = net.routes[nodes_vect[0]->info.route];
+          int trip = nodes_vect[0]->info.trip;
           long long start_n = nodes_vect.back()->node;
           long long end_n = nodes_vect.front()->node;
           unsigned int a;
           for( a = 0; a < route.stops.size(); ++a)
-            if(route.stops[a] == start_n)
+            if(route.stops[a] == end_n)
               break;
 
-          while(route.stops[a] != end_n){
+          while(route.stops[a] != start_n){
             nodes->arr.push_back(new Integer(route.stops[a]));
-
-            ++a;
+            --a;
           }
-          nodes->arr.push_back(new Integer(end_n));
-
+          nodes->arr.push_back(new Integer(start_n));
+          start_t = route.trips[trip][net.route_pos(route.id, start_n)];
+          end_t = nodes_vect.front()->g.time;
         }
         section->add("nodes", nodes);
-        section->add("start", new Integer(nodes_vect.back()->g.time));
-        section->add("end", new Integer(nodes_vect.front()->g.time));
+        section->add("start", new Integer(start_t));
+        section->add("end", new Integer(end_t));
         section->add("idTransport", new Integer(nodes_vect[0]->info.route));
         section->add("public", new Boolean(nodes_vect.front()->info.route != -1));
         section->add("type", new String("walking"));
@@ -710,11 +871,14 @@ void init_graph_complete(Graph& myGraph, std::map<long long,Position> & nodes, s
       continue;
     }
 
-    graph_file >> nd1 >> nd2 >> tmp_char >> time >> tmp_char >> dist >> tmp_char >> co2 >> tmp_char >>  effort >> tmp_char >> h_diff >> tmp_char >> price >> tmp_char;
-    Cost c;
-    c.distance = dist;
-    c.time = time/60.0;
-    myGraph.nodes[nd1][nd2].cost = c;
+    graph_file >> nd1 >> nd2 >> tmp_char >> dist >> tmp_char >> time >> tmp_char >> co2 >> tmp_char >>  effort >> tmp_char >> h_diff >> tmp_char >> price >> tmp_char;
+
+    myGraph.nodes[nd1][nd2].cost.distance = dist;
+    myGraph.nodes[nd1][nd2].cost.height_diff = h_diff;
+    myGraph.nodes[nd1][nd2].cost.time = time/60;
+    myGraph.nodes[nd1][nd2].cost.co2 = co2;
+    myGraph.nodes[nd1][nd2].cost.price = price;
+    myGraph.nodes[nd1][nd2].cost.effort = effort;
 
 
     --nb_arcs_left;
@@ -751,23 +915,43 @@ void init_graph_complete(Graph& myGraph, std::map<long long,Position> & nodes, s
 }
 
 
-void get_start_end(const std::string& in_file, long long& start_node, long long& end_node){
+void get_start_end(const std::string& in_file, long long& start_node, long long& end_node, double& start_time){
 
     Object* obj = (Object*) jsonParseFile(in_file);
 
     Real* n1 = (Real*) obj->obj["start"];
     Real* n2 = (Real*) obj->obj["dest"];
 
+    String* t = (String*) obj->obj["startTime"];
 
    start_node = n1->val;
    end_node = n2->val;
+   start_time = time_str_to_n(t->val);
 
 }
 
-std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, long long start_node, long long end_node){
+void push_ordered(list<pair<Label*,Cost>> &open_all, Label* lb, Cost eval){
+
+  list<pair<Label*,Cost>>::iterator node_it;
+  pair<Label*, Cost> p(lb,eval);
+
+
+  for(node_it = open_all.begin(); node_it != open_all.end(); ++node_it){
+    if(node_it->second.distance >= eval.distance){
+      open_all.insert(node_it, p);
+      break;
+    }
+
+  }
+  if(node_it == open_all.end())
+    open_all.push_back(p);
+
+}
+
+std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, long long start_node, long long end_node, double start_time){
   list<pair<Label*,Cost>> open_all;
   Label* label_tmp = new Label(start_node);
-
+  label_tmp->g.time = start_time;
   open_all.push_back(pair<Label*,Cost>(label_tmp,Cost()));
   return Namoa(myGraph, nodes, end_node, open_all);
 }
@@ -786,8 +970,6 @@ std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, lo
 
     double h_factor = 1.0;
 
-
-    Label* label_tmp;
     map<long long, list<Label*>> open;
     map<long long, list<Label*>> closed;
     list<Label*> best_labels;
@@ -879,7 +1061,7 @@ std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, lo
               continue;
             }
 
-            open_all.push_back(pair<Label*,Cost>(new_label,eval_m));
+            push_ordered(open_all, new_label, eval_m);
             open[m].push_back(new_label);
 
           }else{
@@ -902,7 +1084,7 @@ std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, lo
             continue;
           }
 
-            open_all.push_back(pair<Label*,Cost>(new_label,eval_m));
+            push_ordered(open_all, new_label, eval_m);
             open[m].push_back(new_label);
 
 
