@@ -26,19 +26,25 @@ class Interface : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit Interface(QWidget *parent = nullptr);
+    enum class Criterion { DURATION, CO2, EFFORT, CONNECTIONS, PRICE };
+    explicit Interface(QString dataDir, bool isStatic, QWidget *parent = nullptr);
     ~Interface();
     QJsonObject generateAlgorithmInput();
     void clearItineraryList();
-    void getItineraryData();
-    void setItineraryList();
+    QJsonObject getItineraryData();
+    void setItineraryList(QJsonObject itineraryData);
     void displayItineraryList();
+    void hideItineraryList();
+    void sortItineraryList(Criterion criterion);
+    void setSortBy();
+
 
 private slots:
     void on_swap_clicked();
     void on_search_clicked();
     void displayItinerary(QJsonArray, QStringList, QList<bool>, Itineraire *);
     void displayMouseCoordinates(QVariant, QVariant);
+    void on_sortBy_currentTextChanged(QString);
 
 private:
     Ui::Interface *ui;
@@ -48,7 +54,11 @@ private:
     Graph m_graph;
     std::map<long long, Position> m_nodes;
     Network m_network;
+    QJsonObject m_input;
+    bool m_isStatic;
+    QString m_dataDir;
 
 };
+
 
 #endif // INTERFACE_H

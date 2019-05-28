@@ -28,10 +28,12 @@
 
 using namespace std;
 
-Interface::Interface(QWidget *parent) :
+Interface::Interface(QString dataDir, bool isStatic, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Interface),
-    m_network("Data/r.txt", "")
+    m_network(dataDir.toStdString() + "/transports0.txt", ""),
+    m_isStatic(isStatic),
+    m_dataDir(dataDir)
 {
     ui->setupUi(this);
 
@@ -42,17 +44,21 @@ Interface::Interface(QWidget *parent) :
     /* LEAVE AT */
     ui->depTimeEdit->setTime(QTime::currentTime());
 
-    ui->status->hide();
+    ui->sortBy->hide();
     ui->progressBar->hide();
 
+    /* MESSAGE */
+    ui->status->setText("Click on the map to select beginning and end point");
 
     /* ALGO */
-    QString graph_file("Data/graphWalk.cr");
-    QString nodes_file("Data/nodes.co");
+    QString graph_file(dataDir + "/graphWalk.cr");
+    QString nodes_file(dataDir + "/nodes.co");
 
-    qDebug() << "Initializing graph...";
-    init_graph_complete(m_graph, m_nodes, graph_file.toStdString(), nodes_file.toStdString());
-    qDebug() << "Graph completed !";
+    if (!m_isStatic) {
+        init_graph_complete(m_graph, m_nodes, graph_file.toStdString(), nodes_file.toStdString());
+    }
+
+
 }
 
 Interface::~Interface()
@@ -71,60 +77,46 @@ void Interface::clearItineraryList() {
     m_itineraires.clear();
 }
 
-void Interface::getItineraryData() {
+QJsonObject Interface::getItineraryData() {
     ui->progressBar->setValue(20);
     ui->status->setText("Generating algorithm input");
 
     ui->progressBar->setValue(40);
     ui->status->setText("Calculating itineraries");
 
-    QJsonObject input = generateAlgorithmInput();
-    qDebug() << input;
+    m_input = generateAlgorithmInput();
 
+    qint64 start_node = qint64(m_input["start"].toDouble());
+    qint64 end_node = qint64(m_input["dest"].toDouble());
+    qreal start_time = qreal(m_input["startTime"].toDouble());
 
-
-    qint64 start_node = qint64(input["start"].toDouble());
-    qint64 end_node = qint64(input["dest"].toDouble());
-    qreal start_time = qreal(input["startTime"].toDouble());
-
-    QJsonObject criteriaObj = input["criteria"].toObject();
+    QJsonObject criteriaObj = m_input["criteria"].toObject();
     map<string,bool> criteria;
-    criteria["price"] = input["price"].toBool();
-    criteria["connections"] = input["connections"].toBool();
-    criteria["co2"] = input["co2"].toBool();
-    criteria["effort"] = input["effort"].toBool();
+    criteria["price"] = m_input["price"].toBool();
+    criteria["connections"] = m_input["connections"].toBool();
+    criteria["co2"] = m_input["co2"].toBool();
+    criteria["effort"] = m_input["effort"].toBool();
 
 
     QString result = QString::fromStdString(fusion(m_graph, m_nodes, m_network, start_node, end_node, start_time));
 
-    QFile jSonFile("Data/output.json");
-    if (jSonFile.open(QIODevice::ReadWrite|QIODevice::Truncate)) {
-            QTextStream stream(&jSonFile);
-            QJsonDocument doc = QJsonDocument::fromJson(result.toUtf8());
-            QString strJson(doc.toJson(QJsonDocument::Indented));
-            stream << strJson << endl;
-     }
-    jSonFile.close();
+    QJsonDocument doc = QJsonDocument::fromJson(result.toUtf8());
+    QJsonObject itineraryData = doc.object();
+
+    return itineraryData;
+
 
 }
 
-void Interface::setItineraryList() {
+void Interface::setItineraryList(QJsonObject itineraryData) {
 
-    QString jSonFileStr;
-    QFile jSonFile("Data/output.json");
-    jSonFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    jSonFileStr = jSonFile.readAll();
-    jSonFile.close();
+    QJsonArray itineraries = itineraryData["itineraries"].toArray();
 
-    QJsonDocument jSonDocument = QJsonDocument::fromJson(jSonFileStr.toUtf8());
-    QJsonObject itineraires = jSonDocument.object();
-    QJsonArray it = itineraires["itineraries"].toArray();
-
-    int n = itineraires["nb_itineraries"].toInt();
+    int n = itineraryData["nb_itineraries"].toInt();
 
 
     for (int i(0); i < n; i++) {
-        QJsonObject itinerary = it[i].toObject();
+        QJsonObject itinerary = itineraries[i].toObject();
         m_itineraires.push_back(new Itineraire(itinerary));
         connect(m_itineraires.at(i), SIGNAL(showMoreInfo(QJsonArray, QStringList, QList<bool>, Itineraire *)), this, SLOT(displayItinerary(QJsonArray, QStringList, QList<bool>,Itineraire *)));
     }
@@ -137,37 +129,67 @@ void Interface::displayItineraryList() {
     }
 }
 
+void Interface::hideItineraryList() {
+    for (int i(0); i < m_itineraires.length() ; i++) {
+        ui->techLayout->removeWidget(m_itineraires.at(i));
+    }
+}
+
 void Interface::on_search_clicked() {
-    if (ui->endEdit->text().isEmpty() || ui->startEdit->text().isEmpty())
+    if (!m_isStatic && (ui->endEdit->text().isEmpty() || ui->startEdit->text().isEmpty()))
         return;
 
     ui->search->setDisabled(true);
 
     ui->status->show();
     ui->progressBar->show();
+    ui->sortBy->hide();
 
     ui->status->setText("Clearing previous list");
     ui->progressBar->setValue(0);
 
     clearItineraryList();
-    getItineraryData();
-    setItineraryList();
 
+    QJsonObject itineraryData;
+
+    if (m_isStatic) {
+
+        QFile outputFile(m_dataDir + "/output.json");
+        if (outputFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+
+            QString result = outputFile.readAll();
+
+            QJsonDocument doc = QJsonDocument::fromJson(result.toUtf8());
+            itineraryData = doc.object();
+
+        }
+        outputFile.close();
+
+
+
+    } else {
+        itineraryData = getItineraryData();
+    }
+
+
+
+    setItineraryList(itineraryData);
+    sortItineraryList(Criterion::DURATION);
     ui->progressBar->setValue(80);
 
     if (m_itineraires.size() == 0) {
         ui->status->setText("Sorry, we could not find any itinerary...");
     } else {
-        ui->status->setText("Done !");
+        ui->status->setText("A few itineraries were found.\nClick on an itinerary card to get more information");
+        setSortBy();
+        ui->sortBy->show();
     }
 
 
     ui->search->setDisabled(false);
     displayItineraryList();
     ui->progressBar->setValue(100);
-
-    //ui->status->hide();
-    //ui->progressBar->hide();
+    ui->progressBar->hide();
 }
 
 void Interface::on_swap_clicked() {
@@ -259,4 +281,110 @@ QJsonObject Interface::generateAlgorithmInput() {
     };
 
     return data;
+}
+
+void Interface::sortItineraryList(Criterion criterion) {
+
+
+    for (int i(m_itineraires.size() - 1); i >= 1; i--) {
+        for (int j(0); j <= i-1; j++) {
+
+            bool shouldSwap = false;
+
+            if (criterion == Criterion::PRICE) {
+                shouldSwap = m_itineraires.at(j+1)->getPrice() < m_itineraires.at(j)->getPrice();
+            }
+            else  if (criterion == Criterion::CO2) {
+                shouldSwap = m_itineraires.at(j+1)->getCo2() < m_itineraires.at(j)->getCo2();
+            }
+            else  if (criterion == Criterion::EFFORT) {
+                shouldSwap = m_itineraires.at(j+1)->getEffort() < m_itineraires.at(j)->getEffort();
+
+            }
+            else  if (criterion == Criterion::DURATION) {
+                shouldSwap = m_itineraires.at(j+1)->getDuration() < m_itineraires.at(j)->getDuration();
+            }
+            else  if (criterion == Criterion::CONNECTIONS) {
+                shouldSwap = m_itineraires.at(j+1)->getConnections() < m_itineraires.at(j)->getConnections();
+           }
+
+           if (shouldSwap) {
+                Itineraire * tmp = m_itineraires.at(j+1);
+                m_itineraires.replace(j+1, m_itineraires.at(j));
+                m_itineraires.replace(j,tmp);
+            }
+        }
+    }
+}
+
+void Interface::on_sortBy_currentTextChanged(QString criterion) {
+
+    hideItineraryList();
+
+
+    if (criterion == "Price") {
+        sortItineraryList(Criterion::PRICE);
+    }
+
+    if (criterion == "Duration") {
+        sortItineraryList(Criterion::DURATION);
+    }
+
+    else if (criterion == "Effort") {
+        sortItineraryList(Criterion::EFFORT);
+    }
+    else if (criterion == "CO2 emissions") {
+        sortItineraryList(Criterion::CO2);
+    }
+    else if (criterion == "Connections") {
+        sortItineraryList(Criterion::CONNECTIONS);
+    }
+
+    displayItineraryList();
+}
+
+void Interface::setSortBy() {
+
+    ui->sortBy->clear();
+
+    bool includePrice;
+    bool includeConnections;
+    bool includeCo2;
+    bool includeEffort;
+
+    if (m_isStatic) {
+        includePrice = true;
+        includeConnections = true;
+        includeCo2 = true;
+        includeEffort = true;
+    } else {
+
+        QJsonObject criteria = m_input["criteria"].toObject();
+
+        includePrice = criteria["price"].toBool();
+        includeConnections = criteria["connections"].toBool();
+        includeCo2 = criteria["co2"].toBool();
+        includeEffort = criteria["effort"].toBool();
+    }
+
+
+
+    QStringList sortByList;
+
+    sortByList.push_back("Duration");
+
+    if (includePrice)
+        sortByList.push_back("Price");
+
+    if (includeEffort)
+        sortByList.push_back("Effort");
+
+    if (includeCo2)
+        sortByList.push_back("CO2 emissions");
+
+    if (includeConnections)
+        sortByList.push_back("Connections");
+
+
+    ui->sortBy->addItems(sortByList);
 }

@@ -16,6 +16,9 @@ release/Network.o
 release/Route.o
 release/RouteInfo.o
 release/Stop.o
-release/qrc_ressources.o
+release/qrc_ressources_qmlcache.o
+release/section_qml.o
+release/map_qml.o
+release/qmlcache_loader.o
 release/moc_interface.o
 release/moc_itineraire.o

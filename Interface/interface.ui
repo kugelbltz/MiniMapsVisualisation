@@ -25,7 +25,7 @@
      <widget class="QWidget" name="widget" native="true">
       <property name="maximumSize">
        <size>
-        <width>400</width>
+        <width>600</width>
         <height>16777215</height>
        </size>
       </property>
@@ -118,14 +118,14 @@
               <item>
                <widget class="QRadioButton" name="bike">
                 <property name="text">
-                 <string>bike</string>
+                 <string>biking</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QRadioButton" name="car">
                 <property name="text">
-                 <string>car (not available yet)</string>
+                 <string>driving</string>
                 </property>
                </widget>
               </item>
@@ -222,7 +222,7 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>380</width>
+              <width>580</width>
               <height>205</height>
              </rect>
             </property>
@@ -257,6 +257,35 @@
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
                </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="sortBy">
+               <item>
+                <property name="text">
+                 <string>Duration</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>CO2 emissions</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Effort</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Connections</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Price</string>
+                </property>
+               </item>
               </widget>
              </item>
              <item>

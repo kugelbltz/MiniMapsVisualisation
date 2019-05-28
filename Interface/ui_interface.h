@@ -14,6 +14,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
@@ -76,6 +77,7 @@ public:
     QVBoxLayout *verticalLayout_4;
     QProgressBar *progressBar;
     QLabel *status;
+    QComboBox *sortBy;
     QWidget *techArea;
     QVBoxLayout *verticalLayout_5;
     QVBoxLayout *techLayout;
@@ -99,7 +101,7 @@ public:
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         widget = new QWidget(centralwidget);
         widget->setObjectName(QString::fromUtf8("widget"));
-        widget->setMaximumSize(QSize(400, 16777215));
+        widget->setMaximumSize(QSize(600, 16777215));
         widget->setStyleSheet(QString::fromUtf8(""));
         horizontalLayout_3 = new QHBoxLayout(widget);
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
@@ -245,7 +247,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 380, 205));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 580, 205));
         verticalLayout_4 = new QVBoxLayout(scrollAreaWidgetContents_2);
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         progressBar = new QProgressBar(scrollAreaWidgetContents_2);
@@ -268,6 +270,16 @@ public:
         status->setAlignment(Qt::AlignCenter);
 
         verticalLayout_4->addWidget(status);
+
+        sortBy = new QComboBox(scrollAreaWidgetContents_2);
+        sortBy->addItem(QString());
+        sortBy->addItem(QString());
+        sortBy->addItem(QString());
+        sortBy->addItem(QString());
+        sortBy->addItem(QString());
+        sortBy->setObjectName(QString::fromUtf8("sortBy"));
+
+        verticalLayout_4->addWidget(sortBy);
 
         techArea = new QWidget(scrollAreaWidgetContents_2);
         techArea->setObjectName(QString::fromUtf8("techArea"));
@@ -342,8 +354,8 @@ public:
         swap->setText(QApplication::translate("Interface", "SWAP", nullptr));
         privTrans->setTitle(QApplication::translate("Interface", "Private transportation", nullptr));
         walking->setText(QApplication::translate("Interface", "walking", nullptr));
-        bike->setText(QApplication::translate("Interface", "bike", nullptr));
-        car->setText(QApplication::translate("Interface", "car (not available yet)", nullptr));
+        bike->setText(QApplication::translate("Interface", "biking", nullptr));
+        car->setText(QApplication::translate("Interface", "driving", nullptr));
         depTime->setText(QApplication::translate("Interface", "Leave at :", nullptr));
         search->setText(QApplication::translate("Interface", "Search", nullptr));
         options->setTitle(QApplication::translate("Interface", "Search for best itineraries given :", nullptr));
@@ -353,6 +365,12 @@ public:
         price->setText(QApplication::translate("Interface", "price", nullptr));
         criterias->setText(QApplication::translate("Interface", "Criterias", nullptr));
         status->setText(QApplication::translate("Interface", "Status", nullptr));
+        sortBy->setItemText(0, QApplication::translate("Interface", "Duration", nullptr));
+        sortBy->setItemText(1, QApplication::translate("Interface", "CO2 emissions", nullptr));
+        sortBy->setItemText(2, QApplication::translate("Interface", "Effort", nullptr));
+        sortBy->setItemText(3, QApplication::translate("Interface", "Connections", nullptr));
+        sortBy->setItemText(4, QApplication::translate("Interface", "Price", nullptr));
+
         menuQuit->setTitle(QApplication::translate("Interface", "Quit", nullptr));
         menuIcon->setTitle(QApplication::translate("Interface", "Icon", nullptr));
     } // retranslateUi

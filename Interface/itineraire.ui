@@ -75,86 +75,58 @@
               <number>1</number>
              </property>
              <item row="0" column="0">
-              <widget class="QLabel" name="distance">
-               <property name="text">
-                <string>Distance</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLabel" name="distanceValue">
-               <property name="text">
-                <string>25 g</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
               <widget class="QLabel" name="price">
                <property name="text">
                 <string>Price</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
+             <item row="0" column="1">
               <widget class="QLabel" name="priceValue">
                <property name="text">
                 <string>72 kCal</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
+             <item row="1" column="0">
               <widget class="QLabel" name="connections">
                <property name="text">
                 <string>Connections</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
+             <item row="1" column="1">
               <widget class="QLabel" name="connectionsValue">
                <property name="text">
                 <string>TextLabel</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="heightDifference">
+             <item row="2" column="0">
+              <widget class="QLabel" name="co2">
                <property name="text">
-                <string>Height difference</string>
+                <string>CO2</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
-              <widget class="QLabel" name="heightDifferenceValue">
-               <property name="text">
-                <string>TextLabel</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
+             <item row="2" column="1">
               <widget class="QLabel" name="co2Value">
                <property name="text">
                 <string>TextLabel</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="0">
+             <item row="3" column="0">
               <widget class="QLabel" name="effort">
                <property name="text">
                 <string>Effort</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
+             <item row="3" column="1">
               <widget class="QLabel" name="effortValue">
                <property name="text">
                 <string>TextLabel</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="co2">
-               <property name="text">
-                <string>CO2</string>
                </property>
               </widget>
              </item>

@@ -1,8 +1,5 @@
 # Ignore
-Algo/bin
-Algo/obj
-Data
 Interface/debug
-Interface/release
-Serveur/QuadTree
-Serveur/nodes.co
+Interface/Images
+Interface/Stylesheets
+Data

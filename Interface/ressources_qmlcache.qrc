@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<RCC>
+    <qresource prefix="/Qml"/>
+    <qresource prefix="/">
+        <file alias="Images/icon.png">Images/icon.png</file>
+        <file alias="Images/marker48.png">Images/marker48.png</file>
+        <file alias="Stylesheets/interfaceStylesheet.txt">Stylesheets/interfaceStylesheet.txt</file>
+        <file alias="Images/markerA.png">Images/markerA.png</file>
+        <file alias="Images/markerB.png">Images/markerB.png</file>
+        <file alias="Images/splash.png">Images/splash.png</file>
+    </qresource>
+</RCC>

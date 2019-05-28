@@ -158,6 +158,12 @@ function getName(nodeInfo) {
     return name;
 }
 
+function isInBounds(lat, lon) {
+    let isVerticallyBound = lon < maxLon && lon > minLon;
+    let isHorizontallyBound = lat < maxLat && lat > minLat;
+    return isVerticallyBound && isHorizontallyBound;
+}
+
 function distance(lat1, lon1, lat2, lon2) {
     lat1 *= Math.PI / 180;
     lat2 *= Math.PI / 180;
@@ -182,6 +188,11 @@ function distance(lat1, lon1, lat2, lon2) {
 function initMapAndQuad(data) {
     for (i = 0; i < data.length; i++) {
         let nodeInfo = data[i].split(' ');
+
+        if (nodeInfo[0] === 'p' || nodeInfo[0] == 'c') {
+            continue;
+        }
+
         let info;
 
         let id = parseInt(nodeInfo[1]);
@@ -189,8 +200,7 @@ function initMapAndQuad(data) {
         let lon = parseFloat(nodeInfo[3]);
 
 
-        if (isNaN(lat) || isNaN(lon) || isNaN(id)) {
-            failed += 1;
+        if (isNaN(lat) || isNaN(lon) || isNaN(id) || !isInBounds(lat,lon)) {
             continue;
         }
 
@@ -224,6 +234,7 @@ function setUpAPIRoutes() {
         } else {
             res.send(invalidNode);
         }
+    
         console.timeEnd("getNodeInfo");
     });
 
@@ -236,7 +247,6 @@ function setUpAPIRoutes() {
         let closestNodeId = {
             id: id
         };
-        console.log(closestNodeId);
         res.send(closestNodeId);
     });
 
@@ -244,31 +254,22 @@ function setUpAPIRoutes() {
         console.time("getRouteInfo");
         if (routesData.has(parseInt(req.params.id))) {
             res.send(routesData.get(parseInt(req.params.id)));
+            console.log(routesData.get(parseInt(req.params.id)));
         } else {
             res.send(invalidRoute);
         }
         console.timeEnd("getRouteInfo");
     });
 
-    /*
-    app.get('/stop', (req, res) => {
-        res.send("Bye bitch !")
-        server.close();
-    })
-    */
+
 }
 
 function initAPI() {
-    var server = app.listen(8000, () => {
+    app.listen(8000, () => {
         console.log("Waiting for requests ...");
     })
 
     setUpAPIRoutes();
-}
-
-function stats() {
-    let lossRate = failed / nodesData.size * 100.0;
-    console.log(failed + " nodes lost out of " + nodesData.size + " => " + lossRate + "%");
 }
 
 function initRoutesData(data) {
@@ -305,7 +306,6 @@ const quadTree = new QuadTree(rootRegion);
 
 const nodesData = new Map();
 const routesData = new Map();
-var failed = 0;
 
 const invalidNode = {
     latitude: 99.0,
@@ -350,7 +350,6 @@ Promise.all(uploadTasks)
 .then(() => {
     console.log('All uploads completed.');
     console.timeEnd("Setting up data structures");
-    stats();
     initAPI();
 })
 .catch(() => {});

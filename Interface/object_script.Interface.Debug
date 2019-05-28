@@ -16,6 +16,9 @@ debug/Network.o
 debug/Route.o
 debug/RouteInfo.o
 debug/Stop.o
-debug/qrc_ressources.o
+debug/qrc_ressources_qmlcache.o
+debug/section_qml.o
+debug/map_qml.o
+debug/qmlcache_loader.o
 debug/moc_interface.o
 debug/moc_itineraire.o

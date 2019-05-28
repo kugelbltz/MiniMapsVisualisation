@@ -36,18 +36,14 @@ public:
     QFrame *line;
     QWidget *criterias;
     QFormLayout *criteriasLayout;
-    QLabel *distance;
-    QLabel *distanceValue;
     QLabel *price;
     QLabel *priceValue;
     QLabel *connections;
     QLabel *connectionsValue;
-    QLabel *heightDifference;
-    QLabel *heightDifferenceValue;
+    QLabel *co2;
     QLabel *co2Value;
     QLabel *effort;
     QLabel *effortValue;
-    QLabel *co2;
     QFrame *line2;
     QTextEdit *fullDescription;
 
@@ -106,65 +102,45 @@ public:
         criteriasLayout = new QFormLayout(criterias);
         criteriasLayout->setObjectName(QString::fromUtf8("criteriasLayout"));
         criteriasLayout->setContentsMargins(-1, 1, -1, -1);
-        distance = new QLabel(criterias);
-        distance->setObjectName(QString::fromUtf8("distance"));
-
-        criteriasLayout->setWidget(0, QFormLayout::LabelRole, distance);
-
-        distanceValue = new QLabel(criterias);
-        distanceValue->setObjectName(QString::fromUtf8("distanceValue"));
-
-        criteriasLayout->setWidget(0, QFormLayout::FieldRole, distanceValue);
-
         price = new QLabel(criterias);
         price->setObjectName(QString::fromUtf8("price"));
 
-        criteriasLayout->setWidget(1, QFormLayout::LabelRole, price);
+        criteriasLayout->setWidget(0, QFormLayout::LabelRole, price);
 
         priceValue = new QLabel(criterias);
         priceValue->setObjectName(QString::fromUtf8("priceValue"));
 
-        criteriasLayout->setWidget(1, QFormLayout::FieldRole, priceValue);
+        criteriasLayout->setWidget(0, QFormLayout::FieldRole, priceValue);
 
         connections = new QLabel(criterias);
         connections->setObjectName(QString::fromUtf8("connections"));
 
-        criteriasLayout->setWidget(2, QFormLayout::LabelRole, connections);
+        criteriasLayout->setWidget(1, QFormLayout::LabelRole, connections);
 
         connectionsValue = new QLabel(criterias);
         connectionsValue->setObjectName(QString::fromUtf8("connectionsValue"));
 
-        criteriasLayout->setWidget(2, QFormLayout::FieldRole, connectionsValue);
-
-        heightDifference = new QLabel(criterias);
-        heightDifference->setObjectName(QString::fromUtf8("heightDifference"));
-
-        criteriasLayout->setWidget(3, QFormLayout::LabelRole, heightDifference);
-
-        heightDifferenceValue = new QLabel(criterias);
-        heightDifferenceValue->setObjectName(QString::fromUtf8("heightDifferenceValue"));
-
-        criteriasLayout->setWidget(3, QFormLayout::FieldRole, heightDifferenceValue);
-
-        co2Value = new QLabel(criterias);
-        co2Value->setObjectName(QString::fromUtf8("co2Value"));
-
-        criteriasLayout->setWidget(4, QFormLayout::FieldRole, co2Value);
-
-        effort = new QLabel(criterias);
-        effort->setObjectName(QString::fromUtf8("effort"));
-
-        criteriasLayout->setWidget(5, QFormLayout::LabelRole, effort);
-
-        effortValue = new QLabel(criterias);
-        effortValue->setObjectName(QString::fromUtf8("effortValue"));
-
-        criteriasLayout->setWidget(5, QFormLayout::FieldRole, effortValue);
+        criteriasLayout->setWidget(1, QFormLayout::FieldRole, connectionsValue);
 
         co2 = new QLabel(criterias);
         co2->setObjectName(QString::fromUtf8("co2"));
 
-        criteriasLayout->setWidget(4, QFormLayout::LabelRole, co2);
+        criteriasLayout->setWidget(2, QFormLayout::LabelRole, co2);
+
+        co2Value = new QLabel(criterias);
+        co2Value->setObjectName(QString::fromUtf8("co2Value"));
+
+        criteriasLayout->setWidget(2, QFormLayout::FieldRole, co2Value);
+
+        effort = new QLabel(criterias);
+        effort->setObjectName(QString::fromUtf8("effort"));
+
+        criteriasLayout->setWidget(3, QFormLayout::LabelRole, effort);
+
+        effortValue = new QLabel(criterias);
+        effortValue->setObjectName(QString::fromUtf8("effortValue"));
+
+        criteriasLayout->setWidget(3, QFormLayout::FieldRole, effortValue);
 
 
         itineraireLayout->addWidget(criterias);
@@ -209,18 +185,14 @@ public:
         timeSlot->setText(QApplication::translate("Itineraire", "TextLabel", nullptr));
         duration->setText(QApplication::translate("Itineraire", "TextLabel", nullptr));
         steps->setText(QApplication::translate("Itineraire", "TextLabel", nullptr));
-        distance->setText(QApplication::translate("Itineraire", "Distance", nullptr));
-        distanceValue->setText(QApplication::translate("Itineraire", "25 g", nullptr));
         price->setText(QApplication::translate("Itineraire", "Price", nullptr));
         priceValue->setText(QApplication::translate("Itineraire", "72 kCal", nullptr));
         connections->setText(QApplication::translate("Itineraire", "Connections", nullptr));
         connectionsValue->setText(QApplication::translate("Itineraire", "TextLabel", nullptr));
-        heightDifference->setText(QApplication::translate("Itineraire", "Height difference", nullptr));
-        heightDifferenceValue->setText(QApplication::translate("Itineraire", "TextLabel", nullptr));
+        co2->setText(QApplication::translate("Itineraire", "CO2", nullptr));
         co2Value->setText(QApplication::translate("Itineraire", "TextLabel", nullptr));
         effort->setText(QApplication::translate("Itineraire", "Effort", nullptr));
         effortValue->setText(QApplication::translate("Itineraire", "TextLabel", nullptr));
-        co2->setText(QApplication::translate("Itineraire", "CO2", nullptr));
     } // retranslateUi
 
 };

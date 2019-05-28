@@ -2,7 +2,8 @@ QT += widgets \
     location \
     quickwidgets \
     network \
-    core
+    core \
+    qml
 
 FORMS += \
     interface.ui \
@@ -53,3 +54,5 @@ DISTFILES += \
 
 RESOURCES += \
     ressources.qrc
+
+CONFIG += release

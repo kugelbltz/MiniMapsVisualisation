@@ -19,7 +19,7 @@ Item {
             var lon = path[i]["longitude"];
             var color = polyLine.line.color;
 
-            var qml = "import QtQuick 2.0; import QtLocation 5.6; import QtPositioning 5.6; MapCircle { radius: 10; border.width: 2; border.color: \""+color+"\";color:\"white\"; center: QtPositioning.coordinate("+ lat + ", "+ lon +");}"
+            var qml = "import QtQuick 2.0; import QtLocation 5.6; import QtPositioning 5.6; MapCircle { radius: 15; border.width: 2; border.color: \"white\";color:\"white\"; center: QtPositioning.coordinate("+ lat + ", "+ lon +");}"
 
             var stop = Qt.createQmlObject(qml, theObject);
             stops.push(stop);

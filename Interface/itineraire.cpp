@@ -29,7 +29,7 @@ Itineraire::Itineraire(QJsonObject description, QWidget *parent)  :
     int itStartTime = sections.last().toObject()["start"].toInt();
     int itEndTime = sections.first().toObject()["end"].toInt();
 
-    int itDuration = criterias["time"].toInt();
+    duration = criterias["time"].toInt();
 
     QString endName = nodeAPI.getNodeName(qint64(sections.first().toObject()["nodes"].toArray().first().toDouble()));
 
@@ -76,7 +76,7 @@ Itineraire::Itineraire(QJsonObject description, QWidget *parent)  :
 
     steps.replace(steps.length()-2, 2, "");
 
-    ui->duration->setText(QString::number(itDuration) + " min");
+    ui->duration->setText(QString::number(duration) + " min");
     ui->timeSlot->setText(minToQTime(itStartTime).toString("hh:mm") + " - " + minToQTime(itEndTime).toString("hh:mm"));
     ui->steps->setText(steps);
 
@@ -90,7 +90,7 @@ Itineraire::Itineraire(QJsonObject description, QWidget *parent)  :
     ui->frame->setStyleSheet("QWidget {background-color:lightgray}"
 
                              "QFrame#frame {border: 0px;"
-                             "border-radius:10px}"
+                             "border-radius:5px}"
 
                              "QLabel#duration, QLabel#timeSlot {font: 13pt Abel}"
 
@@ -99,23 +99,38 @@ Itineraire::Itineraire(QJsonObject description, QWidget *parent)  :
 
 
 void Itineraire::setCriterias(QJsonObject criterias) {
-    QString distance = QString::number(criterias["distance"].toInt());
-    ui->distanceValue->setText(distance + " m");
 
-    QString heightDifference = QString::number(criterias["height"].toInt());
-    ui->heightDifferenceValue->setText(heightDifference + " m");
+    price = criterias["price"].toDouble();
+    ui->priceValue->setText(QString::number(price) + " €");
 
-    QString price = QString::number(criterias["price"].toDouble());
-    ui->priceValue->setText(price + " €");
+    co2 = criterias["co2"].toDouble();
+    ui->co2Value->setText(QString::number(co2) + " g");
 
-    QString co2 = QString::number(criterias["co2"].toDouble());
-    ui->co2Value->setText(co2 + " g");
+    effort = criterias["effort"].toInt();
+    ui->effortValue->setText(QString::number(effort) + " kCal");
 
-    QString effort = QString::number(criterias["effort"].toInt());
-    ui->effortValue->setText(effort + " kCal");
+    connections = criterias["connections"].toInt();
+    ui->connectionsValue->setText(QString::number(connections));
+}
 
-    QString connections = QString::number(criterias["connections"].toInt());
-    ui->connectionsValue->setText(connections);
+qreal Itineraire::getPrice() {
+    return price;
+}
+
+int Itineraire::getConnections() {
+    return connections;
+}
+
+qreal Itineraire::getCo2() {
+    return co2;
+}
+
+int Itineraire::getEffort() {
+    return effort;
+}
+
+int Itineraire::getDuration() {
+    return duration;
 }
 
 QString Itineraire::getSectionDescription(int sectionStartTime, int sectionEndTime, int nbStop, int routeId) {
@@ -160,11 +175,11 @@ void Itineraire::getPath(QJsonArray nodes) {
 // SET TRANSPORT COLOR CODE
 QHash<QString, QString> Itineraire::initTransportColor() {
     QHash<QString, QString> hash;
-    hash["tram"] = "indianred";
-    hash["bus"] = "grey";
-    hash["walking"] = "cadetblue";
-    hash["driving"] = "black";
-    hash["biking"] = "lightpink";
+    hash["tram"] = "#353FCC";
+    hash["bus"] = "#209962";
+    hash["walking"] = "#000000";
+    hash["driving"] = "#FFA937";
+    hash["biking"] = "#CC338D";
     return hash;
 }
 
