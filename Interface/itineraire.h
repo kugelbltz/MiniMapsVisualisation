@@ -35,6 +35,7 @@ public:
     qreal getCo2();
     int getEffort();
     int getDuration();
+    int getHeight();
 
 private:
     Ui::Itineraire *ui;
@@ -49,6 +50,7 @@ private:
     qreal co2;
     int effort;
     int duration;
+    int height;
 
 
 signals:

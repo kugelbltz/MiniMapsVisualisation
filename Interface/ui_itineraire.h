@@ -44,6 +44,8 @@ public:
     QLabel *co2Value;
     QLabel *effort;
     QLabel *effortValue;
+    QLabel *height;
+    QLabel *heightValue;
     QFrame *line2;
     QTextEdit *fullDescription;
 
@@ -142,6 +144,16 @@ public:
 
         criteriasLayout->setWidget(3, QFormLayout::FieldRole, effortValue);
 
+        height = new QLabel(criterias);
+        height->setObjectName(QString::fromUtf8("height"));
+
+        criteriasLayout->setWidget(4, QFormLayout::LabelRole, height);
+
+        heightValue = new QLabel(criterias);
+        heightValue->setObjectName(QString::fromUtf8("heightValue"));
+
+        criteriasLayout->setWidget(4, QFormLayout::FieldRole, heightValue);
+
 
         itineraireLayout->addWidget(criterias);
 
@@ -193,6 +205,8 @@ public:
         co2Value->setText(QApplication::translate("Itineraire", "TextLabel", nullptr));
         effort->setText(QApplication::translate("Itineraire", "Effort", nullptr));
         effortValue->setText(QApplication::translate("Itineraire", "TextLabel", nullptr));
+        height->setText(QApplication::translate("Itineraire", "Height difference", nullptr));
+        heightValue->setText(QApplication::translate("Itineraire", "TextLabel", nullptr));
     } // retranslateUi
 
 };

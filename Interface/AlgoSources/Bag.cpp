@@ -102,6 +102,7 @@ bool operator>=(const Bag& b, const Label& l){
   return l <= b;
 }
 
+
 bool Bag::push_nondom(Label* l){
   Bag::iterator it = bag.begin();
 

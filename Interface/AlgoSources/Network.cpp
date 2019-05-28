@@ -77,7 +77,7 @@ long long Network::et(long long r, long long pi, double t_pi) const{
 
 void Network::get_trips(long long r, long long pi, double t_pi, std::vector<long long> &trips) const{
   long long t;
-  
+
   while(t_pi >= 1440)
     t_pi-= 1440;
 
@@ -99,7 +99,6 @@ void Network::init(istream& sroutes, istream& spaths){
   long long id_stop;
 
   sroutes >> nb_routes;
-  int n(0);
   for(long long i=0; i<nb_routes; ++i){
     sroutes >> id_route >> nb_stops >> nb_trips;
     routes[id_route].set(id_route, nb_stops, nb_trips);
@@ -108,7 +107,7 @@ void Network::init(istream& sroutes, istream& spaths){
 
     for(long long j=0; j<nb_stops; ++j){
       sroutes >> id_stop;
-      ++n;
+
       stops[id_stop].id = id_stop;
     //  cout << " " << id_stop << endl;
       stops[id_stop].routes[id_route] = j;
@@ -127,6 +126,37 @@ void Network::init(istream& sroutes, istream& spaths){
   for(it=stops.begin(); it!=stops.end(); ++it){
     Stop& s = it->second;
     s.nb_routes = s.routes.size();
+  }
+
+
+  long long n1, n2;
+  double distance, height_diff, time, price, effort, co2;
+  long long size;
+
+  long long nb;
+
+  long long n;
+
+  spaths >> nb;
+
+  for(long long j=0; j<nb; ++j){
+
+    spaths >> n1 >> n2 >> distance >> height_diff >> time >> effort >> co2 >> price >> size;
+
+
+    footpaths[n1][n2].first.distance = distance;
+    footpaths[n1][n2].first.height_diff = height_diff;
+    footpaths[n1][n2].first.time = time;
+    footpaths[n1][n2].first.price = price;
+
+
+    for(long long i=0; i<size; ++i){
+      spaths >> n;
+      footpaths[n1][n2].second.push_back(n);
+    }
+
+    //cout << *l << endl;
+    // //cout << *(footpaths[n1][n2].back()) << endl;
   }
 
 }

@@ -14,11 +14,13 @@
 
 #include "Route.h"
 #include "Stop.h"
+#include "Label.h"
 
 class Network{
 public:
   std::map<long long, Route> routes;
   std::map<long long, Stop> stops;
+  std::map<long long, std::map<long long, std::pair<Cost, std::vector<long long>> >> footpaths;
 
 public:
 

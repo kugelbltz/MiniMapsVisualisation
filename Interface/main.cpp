@@ -22,13 +22,8 @@ int main(int argc, char * argv[]) {
     QString dirName = dialog.getExistingDirectory();
 
     QStringList dataDirFiles = QDir(dirName).entryList();
-    QStringList requiredFiles;
+    QStringList requiredFiles = {"output.json","nodes.co", "graphWalk.cr", "transports.txt", "footpaths.txt"};
 
-    if (staticMode == QMessageBox::Yes) {
-        requiredFiles = QStringList("output.json");
-    } else {
-        requiredFiles = QStringList({"nodes.co", "graphWalk.cr", "transports0.txt"});
-    }
 
 
     QStringList missingFiles;

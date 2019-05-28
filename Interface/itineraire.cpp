@@ -111,6 +111,9 @@ void Itineraire::setCriterias(QJsonObject criterias) {
 
     connections = criterias["connections"].toInt();
     ui->connectionsValue->setText(QString::number(connections));
+
+    height = criterias["height"].toInt();
+    ui->heightValue->setText(QString::number(height) + " m");
 }
 
 qreal Itineraire::getPrice() {
@@ -131,6 +134,10 @@ int Itineraire::getEffort() {
 
 int Itineraire::getDuration() {
     return duration;
+}
+
+int Itineraire::getHeight() {
+    return height;
 }
 
 QString Itineraire::getSectionDescription(int sectionStartTime, int sectionEndTime, int nbStop, int routeId) {

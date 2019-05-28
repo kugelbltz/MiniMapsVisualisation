@@ -21,6 +21,8 @@
 #include <QEventLoop>
 #include <QProcess>
 #include <map>
+#include <QDebug>
+#include <QMap>
 
 #include "AlgoSources/functions.h"
 #include "AlgoSources/Network.h"
@@ -31,7 +33,7 @@ using namespace std;
 Interface::Interface(QString dataDir, bool isStatic, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Interface),
-    m_network(dataDir.toStdString() + "/transports0.txt", ""),
+    m_network(dataDir.toStdString() + "/transports.txt", dataDir.toStdString() + "/footpaths.txt"),
     m_isStatic(isStatic),
     m_dataDir(dataDir)
 {
@@ -92,13 +94,14 @@ QJsonObject Interface::getItineraryData() {
 
     QJsonObject criteriaObj = m_input["criteria"].toObject();
     map<string,bool> criteria;
-    criteria["price"] = m_input["price"].toBool();
-    criteria["connections"] = m_input["connections"].toBool();
-    criteria["co2"] = m_input["co2"].toBool();
-    criteria["effort"] = m_input["effort"].toBool();
 
+    criteria["price"] = criteriaObj["price"].toBool();
+    criteria["connections"] = criteriaObj["connections"].toBool();
+    criteria["co2"] = criteriaObj["co2"].toBool();
+    criteria["effort"] = criteriaObj["effort"].toBool();
+    criteria["height"] = criteriaObj["height"].toBool();
 
-    QString result = QString::fromStdString(fusion(m_graph, m_nodes, m_network, start_node, end_node, start_time));
+    QString result = QString::fromStdString(fusion(m_graph, m_nodes, m_network, start_node, end_node, start_time, criteria));
 
     QJsonDocument doc = QJsonDocument::fromJson(result.toUtf8());
     QJsonObject itineraryData = doc.object();
@@ -170,7 +173,6 @@ void Interface::on_search_clicked() {
     } else {
         itineraryData = getItineraryData();
     }
-
 
 
     setItineraryList(itineraryData);
@@ -248,6 +250,7 @@ QJsonObject Interface::generateAlgorithmInput() {
     bool includeConnections = ui->connections->isChecked();
     bool includeCo2 = ui->co2->isChecked();
     bool includeEffort = ui->effort->isChecked();
+    bool includeHeight = ui->height->isChecked();
 
     QStringList mouseCord = ui->startEdit->text().split(", ");
     qint64 startNodeId = nodeAPI.getNearestNodeId(mouseCord[0].toDouble(), mouseCord[1].toDouble());
@@ -271,7 +274,8 @@ QJsonObject Interface::generateAlgorithmInput() {
                 {"price", includePrice},
                 {"connections", includeConnections},
                 {"co2", includeCo2},
-                {"effort", includeEffort}
+                {"effort", includeEffort},
+                {"height", includeHeight}
             }
         },
         {"start", startNodeId},
@@ -306,6 +310,8 @@ void Interface::sortItineraryList(Criterion criterion) {
             }
             else  if (criterion == Criterion::CONNECTIONS) {
                 shouldSwap = m_itineraires.at(j+1)->getConnections() < m_itineraires.at(j)->getConnections();
+           } else  if (criterion == Criterion::HEIGHT) {
+                shouldSwap = m_itineraires.at(j+1)->getHeight() < m_itineraires.at(j)->getHeight();
            }
 
            if (shouldSwap) {
@@ -338,7 +344,11 @@ void Interface::on_sortBy_currentTextChanged(QString criterion) {
     }
     else if (criterion == "Connections") {
         sortItineraryList(Criterion::CONNECTIONS);
+    } else if (criterion == "Height difference") {
+
+        sortItineraryList(Criterion::HEIGHT);
     }
+
 
     displayItineraryList();
 }
@@ -351,12 +361,14 @@ void Interface::setSortBy() {
     bool includeConnections;
     bool includeCo2;
     bool includeEffort;
+    bool includeHeight;
 
     if (m_isStatic) {
         includePrice = true;
         includeConnections = true;
         includeCo2 = true;
         includeEffort = true;
+        includeHeight = true;
     } else {
 
         QJsonObject criteria = m_input["criteria"].toObject();
@@ -365,6 +377,7 @@ void Interface::setSortBy() {
         includeConnections = criteria["connections"].toBool();
         includeCo2 = criteria["co2"].toBool();
         includeEffort = criteria["effort"].toBool();
+        includeHeight = criteria["height"].toBool();
     }
 
 
@@ -384,6 +397,8 @@ void Interface::setSortBy() {
 
     if (includeConnections)
         sortByList.push_back("Connections");
+    if (includeHeight)
+        sortByList.push_back("Height difference");
 
 
     ui->sortBy->addItems(sortByList);

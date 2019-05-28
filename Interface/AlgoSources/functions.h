@@ -26,16 +26,18 @@
 #include "Json.h"
 
 double time_str_to_n(std::string);
-
-void fill_footpaths(std::map<long long, std::map<long long, std::list<Label*>>>& footpaths, std::string footpaths_file_path);
+Bag filter_criteria(Bag labels, std::string criterium);
+void filter_cost(std::map<std::string, bool>& criteria, Cost& cost);
+Label* extend_label(Label* l, std::pair<Cost, std::vector<long long>>& p);
+void fill_footpaths(std::map<long long, std::map<long long, std::pair<Cost, std::vector<long long>> >>& footpaths, std::string footpaths_file_path);
 void calculate_footpaths(std::map<long long, Stop>& stops, Graph& myGraph,std::map<long long,Position> &nodes, std::string footpaths_file_path);
 
-std::string fusion(Graph& myGraph, std::map<long long, Position>& nodes,  Network& myNetwork, long long start_node, long long end_node, double start_time);
+std::string fusion(Graph& myGraph, std::map<long long, Position>& nodes,  Network& myNetwork, long long start_node, long long end_node, double start_time, std::map<std::string, bool> criteria);
 void truncate(std::map<long long,Position> &nodes, std::list<Label*> &open_labels, long long end_node, double d);
 void getStops(std::vector<long long>& v, std::map<long long,Position> &nodes, std::map<long long, Stop>& stops, long long start_node, long long d);
-std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, long long start_node, long long end_node, double start_time);
-std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, long long end_node, std::list<std::pair<Label*,Cost>> open_all);
-std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, long long end_node, std::list<Label*>& labels);
+std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, long long start_node, long long end_node, double start_time, std::map<std::string, bool> criteria);
+std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, long long end_node, std::list<std::pair<Label*,Cost>> open_all, std::map<std::string, bool> criteria);
+std::list<Label*> Namoa(Graph& myGraph, std::map<long long, Position>& nodes, long long end_node, std::list<Label*>& labels, std::map<std::string, bool> criteria);
 
 void push_ordered(std::list<std::pair<Label*,Cost>> &open_all, Label* lb, Cost eval);
 

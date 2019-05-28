@@ -99,39 +99,6 @@
            <property name="topMargin">
             <number>0</number>
            </property>
-           <item row="2" column="0">
-            <widget class="QGroupBox" name="privTrans">
-             <property name="title">
-              <string>Private transportation</string>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout">
-              <item>
-               <widget class="QRadioButton" name="walking">
-                <property name="text">
-                 <string>walking</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="bike">
-                <property name="text">
-                 <string>biking</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="car">
-                <property name="text">
-                 <string>driving</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
            <item row="1" column="0">
             <layout class="QFormLayout" name="formLayout_2">
              <item row="0" column="0">
@@ -190,6 +157,13 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QCheckBox" name="height">
+                <property name="text">
+                 <string>height difference</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
@@ -198,6 +172,45 @@
              <property name="text">
               <string>Criterias</string>
              </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QGroupBox" name="privTrans">
+             <property name="title">
+              <string>Private transportation</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <widget class="QRadioButton" name="walking">
+                <property name="text">
+                 <string>walking</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="bike">
+                <property name="text">
+                 <string>biking (not available)</string>
+                </property>
+                <property name="checkable">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="car">
+                <property name="text">
+                 <string>driving (not available)</string>
+                </property>
+                <property name="checkable">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
@@ -223,7 +236,7 @@
               <x>0</x>
               <y>0</y>
               <width>580</width>
-              <height>205</height>
+              <height>185</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">

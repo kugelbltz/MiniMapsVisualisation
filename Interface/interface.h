@@ -26,7 +26,7 @@ class Interface : public QMainWindow
     Q_OBJECT
 
 public:
-    enum class Criterion { DURATION, CO2, EFFORT, CONNECTIONS, PRICE };
+    enum class Criterion { DURATION, CO2, EFFORT, CONNECTIONS, PRICE, HEIGHT };
     explicit Interface(QString dataDir, bool isStatic, QWidget *parent = nullptr);
     ~Interface();
     QJsonObject generateAlgorithmInput();

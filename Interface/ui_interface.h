@@ -55,11 +55,6 @@ public:
     QPushButton *swap;
     QFrame *line;
     QGridLayout *gridLayout;
-    QGroupBox *privTrans;
-    QVBoxLayout *verticalLayout;
-    QRadioButton *walking;
-    QRadioButton *bike;
-    QRadioButton *car;
     QFormLayout *formLayout_2;
     QLabel *depTime;
     QTimeEdit *depTimeEdit;
@@ -70,7 +65,13 @@ public:
     QCheckBox *effort;
     QCheckBox *connections;
     QCheckBox *price;
+    QCheckBox *height;
     QLabel *criterias;
+    QGroupBox *privTrans;
+    QVBoxLayout *verticalLayout;
+    QRadioButton *walking;
+    QRadioButton *bike;
+    QRadioButton *car;
     QFrame *line_2;
     QScrollArea *scrollArea;
     QWidget *scrollAreaWidgetContents_2;
@@ -155,29 +156,6 @@ public:
         gridLayout = new QGridLayout();
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(-1, 0, -1, -1);
-        privTrans = new QGroupBox(widget);
-        privTrans->setObjectName(QString::fromUtf8("privTrans"));
-        verticalLayout = new QVBoxLayout(privTrans);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        walking = new QRadioButton(privTrans);
-        walking->setObjectName(QString::fromUtf8("walking"));
-        walking->setChecked(true);
-
-        verticalLayout->addWidget(walking);
-
-        bike = new QRadioButton(privTrans);
-        bike->setObjectName(QString::fromUtf8("bike"));
-
-        verticalLayout->addWidget(bike);
-
-        car = new QRadioButton(privTrans);
-        car->setObjectName(QString::fromUtf8("car"));
-
-        verticalLayout->addWidget(car);
-
-
-        gridLayout->addWidget(privTrans, 2, 0, 1, 1);
-
         formLayout_2 = new QFormLayout();
         formLayout_2->setObjectName(QString::fromUtf8("formLayout_2"));
         depTime = new QLabel(widget);
@@ -223,6 +201,11 @@ public:
 
         verticalLayout_2->addWidget(price);
 
+        height = new QCheckBox(options);
+        height->setObjectName(QString::fromUtf8("height"));
+
+        verticalLayout_2->addWidget(height);
+
 
         gridLayout->addWidget(options, 1, 1, 2, 1);
 
@@ -230,6 +213,31 @@ public:
         criterias->setObjectName(QString::fromUtf8("criterias"));
 
         gridLayout->addWidget(criterias, 0, 0, 1, 2);
+
+        privTrans = new QGroupBox(widget);
+        privTrans->setObjectName(QString::fromUtf8("privTrans"));
+        verticalLayout = new QVBoxLayout(privTrans);
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        walking = new QRadioButton(privTrans);
+        walking->setObjectName(QString::fromUtf8("walking"));
+        walking->setChecked(true);
+
+        verticalLayout->addWidget(walking);
+
+        bike = new QRadioButton(privTrans);
+        bike->setObjectName(QString::fromUtf8("bike"));
+        bike->setCheckable(false);
+
+        verticalLayout->addWidget(bike);
+
+        car = new QRadioButton(privTrans);
+        car->setObjectName(QString::fromUtf8("car"));
+        car->setCheckable(false);
+
+        verticalLayout->addWidget(car);
+
+
+        gridLayout->addWidget(privTrans, 2, 0, 1, 1);
 
 
         itineraryLayout->addLayout(gridLayout);
@@ -247,7 +255,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 580, 205));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 580, 185));
         verticalLayout_4 = new QVBoxLayout(scrollAreaWidgetContents_2);
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         progressBar = new QProgressBar(scrollAreaWidgetContents_2);
@@ -352,10 +360,6 @@ public:
         end->setText(QApplication::translate("Interface", "Destination :", nullptr));
         endEdit->setPlaceholderText(QApplication::translate("Interface", "Click on the map or type coordinates", nullptr));
         swap->setText(QApplication::translate("Interface", "SWAP", nullptr));
-        privTrans->setTitle(QApplication::translate("Interface", "Private transportation", nullptr));
-        walking->setText(QApplication::translate("Interface", "walking", nullptr));
-        bike->setText(QApplication::translate("Interface", "biking", nullptr));
-        car->setText(QApplication::translate("Interface", "driving", nullptr));
         depTime->setText(QApplication::translate("Interface", "Leave at :", nullptr));
         search->setText(QApplication::translate("Interface", "Search", nullptr));
         options->setTitle(QApplication::translate("Interface", "Search for best itineraries given :", nullptr));
@@ -363,7 +367,12 @@ public:
         effort->setText(QApplication::translate("Interface", "effort", nullptr));
         connections->setText(QApplication::translate("Interface", "connections", nullptr));
         price->setText(QApplication::translate("Interface", "price", nullptr));
+        height->setText(QApplication::translate("Interface", "height difference", nullptr));
         criterias->setText(QApplication::translate("Interface", "Criterias", nullptr));
+        privTrans->setTitle(QApplication::translate("Interface", "Private transportation", nullptr));
+        walking->setText(QApplication::translate("Interface", "walking", nullptr));
+        bike->setText(QApplication::translate("Interface", "biking (not available)", nullptr));
+        car->setText(QApplication::translate("Interface", "driving (not available)", nullptr));
         status->setText(QApplication::translate("Interface", "Status", nullptr));
         sortBy->setItemText(0, QApplication::translate("Interface", "Duration", nullptr));
         sortBy->setItemText(1, QApplication::translate("Interface", "CO2 emissions", nullptr));
